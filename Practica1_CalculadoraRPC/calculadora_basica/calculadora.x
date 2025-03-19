@@ -1,5 +1,7 @@
 
+
 /*  Archivo calculadora.x  */
+
 
 /*  Opcion -N para rpcgen es para no tener las funciones
     con el parámetro extra struct svc_req *req que contiene
@@ -14,7 +16,6 @@ struct operands {
     int op1;     
     int op2;
 };
-
 
 program CALCPROG{
     version CALCSIMPLEVER{            

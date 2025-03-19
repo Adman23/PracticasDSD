@@ -7,15 +7,15 @@
 // El indice de las operaciones va igual que lo definido
 // como número de operacion en el archivo .x
 // Se controla automático, no necesita indicarlo el usuario
+
 void
-calcprog_1(char *host, int operation, operands op, nums list)
+calcprog_1(char *host, int operation, operands op, nums list, nums vectors)
 {
 	/* Se definen las siguientes estructuras, pero no se usarán todas, dependerá de el procedimiento*/
 	CLIENT *clnt;
 	int  *result_int;
 	float *result_float;
-	nums  		num_list = list;
-	operands  	operand_args = op;
+	nums result_vector;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, CALCPROG, CALCSIMPLEVER, "udp");
@@ -27,30 +27,41 @@ calcprog_1(char *host, int operation, operands op, nums list)
 
 	switch (operation)
 	{
-	case 1: result_int = sum_1(&num_list, clnt);
+	case 1: result_int = sum_1(&list, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "sum call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
-	case 2: result_int = sub_1(&operand_args, clnt);
+	case 2: result_int = sub_1(&op, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "sub call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
-	case 3: result_int = mult_1(&num_list, clnt);
+	case 3: result_int = mult_1(&list, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "mult call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
 
-	case 4: result_float = div_1(&operand_args, clnt);
+	case 4: result_float = div_1(&op, clnt);
 			if (result_float == (float *) NULL) {
 				clnt_perror (clnt, "div call failed");
 			}
 			printf("Result: %f\n", *result_float);
+			break;
+
+	case 5: result_vector = calcadvanprog_1(&vectors, clnt);
+			if (result_vector == (nums *) NULL) {
+				clnt_perror (clnt, "vectorsum call failed");
+			}
+			printf("Result: ");
+			for (int i = 0; i < result_vector->nums_len; i++) {
+				printf("%d ", result_vector->nums_val[i]);
+			}
+			printf("\n");
 			break;
 	
 	default:perror("not a valid operation index");
@@ -61,6 +72,7 @@ calcprog_1(char *host, int operation, operands op, nums list)
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
 }
+
 
 
 int

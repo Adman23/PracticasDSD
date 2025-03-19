@@ -1,6 +1,6 @@
 
 /*  Archivo calculadora.x para realización de operaciones
-    aritméticas simples (por ahora) */
+    aritméticas simples */
 
 /*  Los programas recibiran una estructura que contendrá un listado de 
     operandos (ya que se lo estas pasando a funciones específicas), esto

@@ -3,6 +3,10 @@
  */
 
 #include "calculadora.h"
+#include "../calculadora_avanzada/calculadora_avanzada.h"
+
+
+
 
 int *
 sum_1_svc(nums *list, struct svc_req *rqstp)
@@ -58,3 +62,35 @@ div_1_svc(operands *operands, struct svc_req *rqstp)
 
 	return &result;
 }
+
+
+nums *
+calcadvanprog_1(char *host, vector_operands *op)
+{
+	CLIENT *clnt;
+	nums  *result;
+	vector_operands  vectorsum_1_arg;
+	vectorsum_1_arg.op1 = op->op1;
+	vectorsum_1_arg.op2 = op->op2;
+
+#ifndef	DEBUG
+	clnt = clnt_create (host, CALCADVANPROG, CALCADVANVER, "udp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+#endif	/* DEBUG */
+
+	result = vectorsum_1(&vectorsum_1_arg, clnt);
+	if (result == (nums *) NULL) {
+		clnt_perror (clnt, "call to vectorsum failed");
+	}
+
+#ifndef	DEBUG
+	clnt_destroy (clnt);
+#endif	 /* DEBUG */
+
+	return &result;
+}
+
+

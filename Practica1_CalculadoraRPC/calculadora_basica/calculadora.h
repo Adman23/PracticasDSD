@@ -26,12 +26,6 @@ struct operands {
 };
 typedef struct operands operands;
 
-struct vs {
-	nums op1;
-	nums op2;
-};
-typedef struct vs vs;
-
 #define CALCPROG 0x20000001
 #define CALCSIMPLEVER 1
 
@@ -48,9 +42,6 @@ extern  int * mult_1_svc(nums *, struct svc_req *);
 #define DIV 4
 extern  float * div_1(operands *, CLIENT *);
 extern  float * div_1_svc(operands *, struct svc_req *);
-#define SUM_VECTOR 5
-extern  nums * sum_vector_1(vs *, CLIENT *);
-extern  nums * sum_vector_1_svc(vs *, struct svc_req *);
 extern int calcprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -66,9 +57,6 @@ extern  int * mult_1_svc();
 #define DIV 4
 extern  float * div_1();
 extern  float * div_1_svc();
-#define SUM_VECTOR 5
-extern  nums * sum_vector_1();
-extern  nums * sum_vector_1_svc();
 extern int calcprog_1_freeresult ();
 #endif /* K&R C */
 
@@ -77,12 +65,10 @@ extern int calcprog_1_freeresult ();
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t xdr_nums (XDR *, nums*);
 extern  bool_t xdr_operands (XDR *, operands*);
-extern  bool_t xdr_vs (XDR *, vs*);
 
 #else /* K&R C */
 extern bool_t xdr_nums ();
 extern bool_t xdr_operands ();
-extern bool_t xdr_vs ();
 
 #endif /* K&R C */
 

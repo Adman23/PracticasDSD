@@ -24,7 +24,6 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		operands sub_1_arg;
 		nums mult_1_arg;
 		operands div_1_arg;
-		vs sum_vector_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -57,12 +56,6 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_operands;
 		_xdr_result = (xdrproc_t) xdr_float;
 		local = (char *(*)(char *, struct svc_req *)) div_1_svc;
-		break;
-
-	case SUM_VECTOR:
-		_xdr_argument = (xdrproc_t) xdr_vs;
-		_xdr_result = (xdrproc_t) xdr_nums;
-		local = (char *(*)(char *, struct svc_req *)) sum_vector_1_svc;
 		break;
 
 	default:

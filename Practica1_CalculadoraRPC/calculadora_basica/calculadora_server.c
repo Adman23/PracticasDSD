@@ -64,40 +64,4 @@ div_1_svc(operands *operands, struct svc_req *rqstp)
 }
 
 
-nums *
-sum_vector_1_svc(vs *vectors, struct svc_req *rqstp)
-{
-	CLIENT *clnt_2;
-	char *host = "localhost";
-	nums  *result;
-	vector_operands  vectorsum_1_arg;
-	vectorsum_1_arg.op1.v_val = vectors->op1.nums_val;
-	vectorsum_1_arg.op1.v_len = vectors->op1.nums_len;
-	vectorsum_1_arg.op2.v_val = vectors->op2.nums_val;
-	vectorsum_1_arg.op2.v_len = vectors->op2.nums_len;
-
-
-#ifndef	DEBUG_2
-	clnt_2 = clnt_create (host, CALCADVANPROG, CALCADVANVER, "udp");
-	if (clnt_2 == NULL) {
-		clnt_pcreateerror (host);
-		exit (1);
-	}
-#endif	/* DEBUG */
-
-	v* vec = vectorsum_1(&vectorsum_1_arg, clnt_2);
-	result->nums_val = vec->v_val;
-	result->nums_len = vec->v_len;
-
-	if (result == (nums *) NULL) {
-		clnt_perror (clnt_2, "call to vectorsum failed");
-	}
-
-#ifndef	DEBUG_2
-	clnt_destroy (clnt_2);
-#endif	 /* DEBUG */
-
-	return &result;
-}
-
 

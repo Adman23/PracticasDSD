@@ -27,15 +27,3 @@ xdr_operands (XDR *xdrs, operands *objp)
 		 return FALSE;
 	return TRUE;
 }
-
-bool_t
-xdr_vs (XDR *xdrs, vs *objp)
-{
-	register int32_t *buf;
-
-	 if (!xdr_nums (xdrs, &objp->op1))
-		 return FALSE;
-	 if (!xdr_nums (xdrs, &objp->op2))
-		 return FALSE;
-	return TRUE;
-}

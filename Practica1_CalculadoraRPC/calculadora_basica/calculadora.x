@@ -23,6 +23,5 @@ program CALCPROG{
         int SUB(operands) = 2;  /* Resta simple */
         int MULT(nums) = 3; /* Multiplicación simple */
         float DIV(operands) = 4;/* División simple */
-        nums SUM_VECTOR(vs) = 5; /* Suma de vectores */
     } = 1;
 } = 0x20000001;

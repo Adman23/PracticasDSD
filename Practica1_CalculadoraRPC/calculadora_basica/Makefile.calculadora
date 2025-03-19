@@ -8,8 +8,8 @@ SERVER = calculadora_server
 
 SOURCES_CLNT.c = 
 SOURCES_CLNT.h = 
-SOURCES_SVC.c = 
-SOURCES_SVC.h = 
+SOURCES_SVC.c = ../calculadora_avanzada/calculadora_avanzada_*.c
+SOURCES_SVC.h = ../calculadora_avanzada/calculadora_avanzada.h
 SOURCES.x = calculadora.x
 
 TARGETS_SVC.c = calculadora_svc.c calculadora_server.c calculadora_xdr.c 

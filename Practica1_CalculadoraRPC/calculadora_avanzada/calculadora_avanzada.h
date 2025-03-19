@@ -13,16 +13,16 @@
 extern "C" {
 #endif
 
-#define MAX 10
+#define MAX_SIZE 10
 
 typedef struct {
-	u_int nums_len;
-	int *nums_val;
-} nums;
+	u_int v_len;
+	int *v_val;
+} v;
 
 struct vector_operands {
-	nums op1;
-	nums op2;
+	v op1;
+	v op2;
 };
 typedef struct vector_operands vector_operands;
 
@@ -31,25 +31,25 @@ typedef struct vector_operands vector_operands;
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define VECTORSUM 1
-extern  nums * vectorsum_1(vector_operands *, CLIENT *);
-extern  nums * vectorsum_1_svc(vector_operands *, struct svc_req *);
+extern  v * vectorsum_1(vector_operands *, CLIENT *);
+extern  v * vectorsum_1_svc(vector_operands *, struct svc_req *);
 extern int calcadvanprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
 #define VECTORSUM 1
-extern  nums * vectorsum_1();
-extern  nums * vectorsum_1_svc();
+extern  v * vectorsum_1();
+extern  v * vectorsum_1_svc();
 extern int calcadvanprog_1_freeresult ();
 #endif /* K&R C */
 
 /* the xdr functions */
 
 #if defined(__STDC__) || defined(__cplusplus)
-extern  bool_t xdr_nums (XDR *, nums*);
+extern  bool_t xdr_v (XDR *, v*);
 extern  bool_t xdr_vector_operands (XDR *, vector_operands*);
 
 #else /* K&R C */
-extern bool_t xdr_nums ();
+extern bool_t xdr_v ();
 extern bool_t xdr_vector_operands ();
 
 #endif /* K&R C */

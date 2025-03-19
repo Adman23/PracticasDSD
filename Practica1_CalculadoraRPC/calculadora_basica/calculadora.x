@@ -19,11 +19,18 @@ struct operands {
     int op2;
 };
 
+struct vs {
+    nums op1;
+    nums op2;
+};
+
+
 program CALCPROG{
     version CALCSIMPLEVER{            
         int SUM(nums) = 1;  /* Suma simple */
         int SUB(operands) = 2;  /* Resta simple */
         int MULT(nums) = 3; /* Multiplicación simple */
         float DIV(operands) = 4;/* División simple */
+        nums SUM_VECTOR(vs) = 5; /* Suma de vectores */
     } = 1;
 } = 0x20000001;

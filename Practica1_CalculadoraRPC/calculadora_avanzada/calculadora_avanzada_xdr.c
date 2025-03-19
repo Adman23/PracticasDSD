@@ -3,27 +3,27 @@
  * It was generated using rpcgen.
  */
 
-#include "calculadora.h"
+#include "calculadora_avanzada.h"
 
 bool_t
-xdr_nums (XDR *xdrs, nums *objp)
+xdr_v (XDR *xdrs, v *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_array (xdrs, (char **)&objp->nums_val, (u_int *) &objp->nums_len, MAX,
+	 if (!xdr_array (xdrs, (char **)&objp->v_val, (u_int *) &objp->v_len, MAX,
 		sizeof (int), (xdrproc_t) xdr_int))
 		 return FALSE;
 	return TRUE;
 }
 
 bool_t
-xdr_operands (XDR *xdrs, operands *objp)
+xdr_vector_operands (XDR *xdrs, vector_operands *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->op1))
+	 if (!xdr_v (xdrs, &objp->op1))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->op2))
+	 if (!xdr_v (xdrs, &objp->op2))
 		 return FALSE;
 	return TRUE;
 }

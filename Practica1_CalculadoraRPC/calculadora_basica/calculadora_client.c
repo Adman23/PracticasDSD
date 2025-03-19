@@ -9,13 +9,13 @@
 // Se controla automático, no necesita indicarlo el usuario
 
 void
-calcprog_1(char *host, int operation, operands op, nums list, nums vectors)
+calcprog_1(char *host, int operation, operands op, nums list, vs vectors)
 {
 	/* Se definen las siguientes estructuras, pero no se usarán todas, dependerá de el procedimiento*/
 	CLIENT *clnt;
 	int  *result_int;
 	float *result_float;
-	nums result_vector;
+	nums *result_vector;
 
 #ifndef	DEBUG
 	clnt = clnt_create (host, CALCPROG, CALCSIMPLEVER, "udp");
@@ -53,7 +53,7 @@ calcprog_1(char *host, int operation, operands op, nums list, nums vectors)
 			printf("Result: %f\n", *result_float);
 			break;
 
-	case 5: result_vector = calcadvanprog_1(&vectors, clnt);
+	case 5: result_vector = sum_vector_1(&vectors, clnt);
 			if (result_vector == (nums *) NULL) {
 				clnt_perror (clnt, "vectorsum call failed");
 			}
@@ -79,8 +79,9 @@ int
 main (int argc, char *argv[])
 {
 	char *host;
-	operands op;
-	nums list;
+	operands op = {0, 0};
+	nums list = {0, NULL};
+	vs vectors = {{0, NULL}, {0, NULL}};
 
 	if (argc < 5) {
 		printf ("usage: %s server_host operation", argv[0]);
@@ -123,13 +124,13 @@ main (int argc, char *argv[])
 
 	switch (operation[0])
 	{
-		case '+': calcprog_1 (host, 1, op, list);
+		case '+': calcprog_1 (host, 1, op, list, vectors);
 				break;
-		case '-': calcprog_1 (host, 2, op, list);
+		case '-': calcprog_1 (host, 2, op, list, vectors);
 				break;
-		case '*': calcprog_1 (host, 3, op, list);
+		case '*': calcprog_1 (host, 3, op, list, vectors);
 				break;
-		case '/': calcprog_1 (host, 4, op, list);
+		case '/': calcprog_1 (host, 4, op, list, vectors);
 				break;
 	}
 exit (0);

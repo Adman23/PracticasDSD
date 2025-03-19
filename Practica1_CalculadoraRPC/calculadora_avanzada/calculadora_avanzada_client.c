@@ -5,13 +5,15 @@
  */
 
 #include "calculadora_avanzada.h"
+#include "../calculadora_basica/calculadora.h"
+
 
 
 void
 calcadvanprog_1(char *host)
 {
 	CLIENT *clnt;
-	nums  *result_1;
+	v  *result_1;
 	vector_operands  vectorsum_1_arg;
 
 #ifndef	DEBUG
@@ -23,7 +25,7 @@ calcadvanprog_1(char *host)
 #endif	/* DEBUG */
 
 	result_1 = vectorsum_1(&vectorsum_1_arg, clnt);
-	if (result_1 == (nums *) NULL) {
+	if (result_1 == (v *) NULL) {
 		clnt_perror (clnt, "call failed");
 	}
 #ifndef	DEBUG

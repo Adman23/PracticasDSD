@@ -6,13 +6,13 @@
 
 #include "calculadora_avanzada.h"
 
-nums *
+v *
 vectorsum_1_svc(vector_operands *op, struct svc_req *rqstp)
 {
-	static nums  result;
+	static v  result;
 	
 	/* Vemos que vector es más grande de los dos */
-	int min = op->op1.nums_len <= op->op2.nums_len ? op->op1.nums_len : op->op2.nums_len;
+	int min = op->op1.v_len <= op->op2.v_len ? op->op1.v_len : op->op2.v_len;
 	
 	/* Liberamos la memoria del resultado */
 	xdr_free(xdr_nums, &result);
@@ -20,22 +20,22 @@ vectorsum_1_svc(vector_operands *op, struct svc_req *rqstp)
 	/* Sumamos componente a componente los vectores */
 	int i = 0;
 	for (i = 0; i < min; i++) {
-		result.nums_val[i] = op->op1.nums_val[i] + op->op2.nums_val[i];
+		result.v_val[i] = op->op1.v_val[i] + op->op2.v_val[i];
 	}
 
 	/* Asignamos el resto de valores si había uno más grande que otro */
-	if (i < op->op1.nums_len) {
-		for (; i < op->op1.nums_len; i++) {
-			result.nums_val[i] = op->op1.nums_val[i];
+	if (i < op->op1.v_len) {
+		for (; i < op->op1.v_len; i++) {
+			result.v_val[i] = op->op1.v_val[i];
 		}
-	} else if (i < op->op2.nums_len) {
-		for (; i < op->op2.nums_len; i++) {
-			result.nums_val[i] = op->op2.nums_val[i];
+	} else if (i < op->op2.v_len) {
+		for (; i < op->op2.v_len; i++) {
+			result.v_val[i] = op->op2.v_val[i];
 		}
 	}
 
 	/* Asignamos el tamaño */
-	result.nums_len = i;
+	result.v_len = i;
 
 	return &result;
 }

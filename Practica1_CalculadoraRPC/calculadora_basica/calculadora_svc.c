@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "calculadora_avanzada.h"
+#include "calculadora.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rpc/pmap_clnt.h>
@@ -17,10 +17,14 @@
 #endif
 
 static void
-calcadvanprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		vector_operands vectorsum_1_arg;
+		nums sum_1_arg;
+		operands sub_1_arg;
+		nums mult_1_arg;
+		operands div_1_arg;
+		vs sum_vector_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -31,10 +35,34 @@ calcadvanprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
 		return;
 
-	case VECTORSUM:
-		_xdr_argument = (xdrproc_t) xdr_vector_operands;
+	case SUM:
+		_xdr_argument = (xdrproc_t) xdr_nums;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) sum_1_svc;
+		break;
+
+	case SUB:
+		_xdr_argument = (xdrproc_t) xdr_operands;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) sub_1_svc;
+		break;
+
+	case MULT:
+		_xdr_argument = (xdrproc_t) xdr_nums;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) mult_1_svc;
+		break;
+
+	case DIV:
+		_xdr_argument = (xdrproc_t) xdr_operands;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) div_1_svc;
+		break;
+
+	case SUM_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_vs;
 		_xdr_result = (xdrproc_t) xdr_nums;
-		local = (char *(*)(char *, struct svc_req *)) vectorsum_1_svc;
+		local = (char *(*)(char *, struct svc_req *)) sum_vector_1_svc;
 		break;
 
 	default:
@@ -62,15 +90,15 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (CALCADVANPROG, CALCADVANVER);
+	pmap_unset (CALCPROG, CALCSIMPLEVER);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, CALCADVANPROG, CALCADVANVER, calcadvanprog_1, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (CALCADVANPROG, CALCADVANVER, udp).");
+	if (!svc_register(transp, CALCPROG, CALCSIMPLEVER, calcprog_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (CALCPROG, CALCSIMPLEVER, udp).");
 		exit(1);
 	}
 
@@ -79,8 +107,8 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, CALCADVANPROG, CALCADVANVER, calcadvanprog_1, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (CALCADVANPROG, CALCADVANVER, tcp).");
+	if (!svc_register(transp, CALCPROG, CALCSIMPLEVER, calcprog_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (CALCPROG, CALCSIMPLEVER, tcp).");
 		exit(1);
 	}
 

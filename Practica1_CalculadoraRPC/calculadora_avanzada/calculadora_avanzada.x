@@ -2,17 +2,17 @@
  * operaciones avanzadas, de vectores y matrices   
  */
 
+const MAX_SIZE = 10; /* Máximo de 10 operandos */
+typedef int v<MAX>; /* Listado de int que son los operandos */
 
-const MAX = 10; /* Máximo vectores de 10 elementos */
-typedef int nums<MAX>; /* Listado de int que son los operandos */
 
 struct vector_operands { 
-    nums op1;     
-    nums op2;
+    v op1;     
+    v op2;
 };
 
 program CALCADVANPROG{
     version CALCADVANVER{            
-        nums VECTORSUM(vector_operands) = 1;
+        v VECTORSUM(vector_operands) = 1;
     } = 1;
 } = 0x20000002;

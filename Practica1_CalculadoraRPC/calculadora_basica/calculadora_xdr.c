@@ -3,7 +3,7 @@
  * It was generated using rpcgen.
  */
 
-#include "calculadora_avanzada.h"
+#include "calculadora.h"
 
 bool_t
 xdr_nums (XDR *xdrs, nums *objp)
@@ -17,7 +17,19 @@ xdr_nums (XDR *xdrs, nums *objp)
 }
 
 bool_t
-xdr_vector_operands (XDR *xdrs, vector_operands *objp)
+xdr_operands (XDR *xdrs, operands *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_int (xdrs, &objp->op1))
+		 return FALSE;
+	 if (!xdr_int (xdrs, &objp->op2))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
+xdr_vs (XDR *xdrs, vs *objp)
 {
 	register int32_t *buf;
 

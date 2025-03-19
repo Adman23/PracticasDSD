@@ -70,12 +70,48 @@ main (int argc, char *argv[])
 	operands op;
 	nums list;
 
-	if (argc < 5) {
-		printf ("usage: %s server_host operation", argv[0]);
-		printf (" operand1 operand2 {operand3 operand4 ... operand10}(in case of '+' or '\\*' \n");
-		exit (1);
+	
+	if (argc < 2) {
+		printf ("Uso: %s server_host\n", argv[0]);
+		printf ("use: %s server_host -h, to see all modes", argv[0]);
+		printf ("use: %s server_host mode -h, to see how it works", argv[0]);
+		exit(1);
 	}
 
+
+	if (argc == 2 && strcmp(argv[1], "-h") == 0)
+	{
+		printf ("Operaciones disponibles:\n");
+		printf ("  + : Suma de múltiples operandos\n");
+		printf ("  - : Resta de dos operandos\n");
+		printf ("  \\* : Multiplicación de múltiples operandos\n");
+		printf ("  / : División de dos operandos\n");
+		printf ("\nEjemplos:\n");
+		printf ("  %s localhost + 1 2 3 4\n", argv[0]);
+		printf ("  %s localhost - 5 2\n", argv[0]);
+		printf ("  %s localhost \\* 5 4 3 2 1\n", argv[0]);
+		printf ("  %s localhost + 1 2 3 4\n", argv[0]);
+		exit (1);
+	}
+	else
+	if (argc == 3 && strcmp(argv[1], "-h") == 0 && strcmp(argv[2], "basic") == 0)
+	{
+		printf ("Operaciones disponibles para modo básico:\n");
+		printf ("  + : Suma de múltiples operandos\n");
+		printf ("  - : Resta de dos operandos\n");
+		printf ("  \\* : Multiplicación de múltiples operandos\n");
+		printf ("  / : División de dos operandos\n");
+		printf ("\nEjemplos:\n");
+		printf ("+ 1 2 3 4\n", argv[0]);
+		printf ("- 5 2\n", argv[0]);
+		printf ("\\* 5 4 3 2 1\n", argv[0]);
+		printf ("+ 1 2 3 4\n", argv[0]);
+		exit (1);
+	}
+	else
+	
+	
+	
 	host = argv[1];
 	char *operation = argv[2];
 	if (strlen(operation) != 1) {

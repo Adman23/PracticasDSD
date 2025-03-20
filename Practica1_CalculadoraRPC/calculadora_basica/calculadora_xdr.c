@@ -17,13 +17,36 @@ xdr_nums (XDR *xdrs, nums *objp)
 }
 
 bool_t
-xdr_operands (XDR *xdrs, operands *objp)
+xdr_matrix (XDR *xdrs, matrix *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_int (xdrs, &objp->op1))
+	 if (!xdr_array (xdrs, (char **)&objp->matrix_val, (u_int *) &objp->matrix_len, MAX,
+		sizeof (nums), (xdrproc_t) xdr_nums))
 		 return FALSE;
-	 if (!xdr_int (xdrs, &objp->op2))
+	return TRUE;
+}
+
+bool_t
+xdr_matrix_group (XDR *xdrs, matrix_group *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_matrix (xdrs, &objp->m1))
+		 return FALSE;
+	 if (!xdr_matrix (xdrs, &objp->m2))
+		 return FALSE;
+	return TRUE;
+}
+
+bool_t
+xdr_oper (XDR *xdrs, oper *objp)
+{
+	register int32_t *buf;
+
+	 if (!xdr_float (xdrs, &objp->base))
+		 return FALSE;
+	 if (!xdr_float (xdrs, &objp->operator))
 		 return FALSE;
 	return TRUE;
 }

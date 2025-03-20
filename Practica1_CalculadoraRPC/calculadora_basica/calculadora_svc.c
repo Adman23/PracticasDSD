@@ -21,9 +21,9 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		nums sum_1_arg;
-		operands sub_1_arg;
+		nums sub_1_arg;
 		nums mult_1_arg;
-		operands div_1_arg;
+		nums div_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -41,7 +41,7 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case SUB:
-		_xdr_argument = (xdrproc_t) xdr_operands;
+		_xdr_argument = (xdrproc_t) xdr_nums;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) sub_1_svc;
 		break;
@@ -53,9 +53,182 @@ calcprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case DIV:
-		_xdr_argument = (xdrproc_t) xdr_operands;
+		_xdr_argument = (xdrproc_t) xdr_nums;
 		_xdr_result = (xdrproc_t) xdr_float;
 		local = (char *(*)(char *, struct svc_req *)) div_1_svc;
+		break;
+
+	default:
+		svcerr_noproc (transp);
+		return;
+	}
+	memset ((char *)&argument, 0, sizeof (argument));
+	if (!svc_getargs (transp, (xdrproc_t) _xdr_argument, (caddr_t) &argument)) {
+		svcerr_decode (transp);
+		return;
+	}
+	result = (*local)((char *)&argument, rqstp);
+	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
+		svcerr_systemerr (transp);
+	}
+	if (!svc_freeargs (transp, (xdrproc_t) _xdr_argument, (caddr_t) &argument)) {
+		fprintf (stderr, "%s", "unable to free arguments");
+		exit (1);
+	}
+	return;
+}
+
+static void
+calcadvancedprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+{
+	union {
+		char *sufix_1_arg;
+		oper power_1_arg;
+		oper sqrt_1_arg;
+		oper mod_1_arg;
+		oper gcd_1_arg;
+		float fibonacci_1_arg;
+	} argument;
+	char *result;
+	xdrproc_t _xdr_argument, _xdr_result;
+	char *(*local)(char *, struct svc_req *);
+
+	switch (rqstp->rq_proc) {
+	case NULLPROC:
+		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
+		return;
+
+	case SUFIX:
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) sufix_1_svc;
+		break;
+
+	case POWER:
+		_xdr_argument = (xdrproc_t) xdr_oper;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) power_1_svc;
+		break;
+
+	case SQRT:
+		_xdr_argument = (xdrproc_t) xdr_oper;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) sqrt_1_svc;
+		break;
+
+	case MOD:
+		_xdr_argument = (xdrproc_t) xdr_oper;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) mod_1_svc;
+		break;
+
+	case GCD:
+		_xdr_argument = (xdrproc_t) xdr_oper;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) gcd_1_svc;
+		break;
+
+	case FIBONACCI:
+		_xdr_argument = (xdrproc_t) xdr_float;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) fibonacci_1_svc;
+		break;
+
+	default:
+		svcerr_noproc (transp);
+		return;
+	}
+	memset ((char *)&argument, 0, sizeof (argument));
+	if (!svc_getargs (transp, (xdrproc_t) _xdr_argument, (caddr_t) &argument)) {
+		svcerr_decode (transp);
+		return;
+	}
+	result = (*local)((char *)&argument, rqstp);
+	if (result != NULL && !svc_sendreply(transp, (xdrproc_t) _xdr_result, result)) {
+		svcerr_systemerr (transp);
+	}
+	if (!svc_freeargs (transp, (xdrproc_t) _xdr_argument, (caddr_t) &argument)) {
+		fprintf (stderr, "%s", "unable to free arguments");
+		exit (1);
+	}
+	return;
+}
+
+static void
+calcvectormatrixprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+{
+	union {
+		matrix sum_vector_1_arg;
+		matrix sub_vector_1_arg;
+		matrix cross_vector_1_arg;
+		nums mul_vector_1_arg;
+		nums mod_vector_1_arg;
+		matrix_group sum_matrix_1_arg;
+		matrix_group sub_matrix_1_arg;
+		matrix_group mul_matrix_1_arg;
+		matrix mod_matrix_1_arg;
+	} argument;
+	char *result;
+	xdrproc_t _xdr_argument, _xdr_result;
+	char *(*local)(char *, struct svc_req *);
+
+	switch (rqstp->rq_proc) {
+	case NULLPROC:
+		(void) svc_sendreply (transp, (xdrproc_t) xdr_void, (char *)NULL);
+		return;
+
+	case SUM_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_matrix;
+		_xdr_result = (xdrproc_t) xdr_nums;
+		local = (char *(*)(char *, struct svc_req *)) sum_vector_1_svc;
+		break;
+
+	case SUB_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_matrix;
+		_xdr_result = (xdrproc_t) xdr_nums;
+		local = (char *(*)(char *, struct svc_req *)) sub_vector_1_svc;
+		break;
+
+	case CROSS_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_matrix;
+		_xdr_result = (xdrproc_t) xdr_nums;
+		local = (char *(*)(char *, struct svc_req *)) cross_vector_1_svc;
+		break;
+
+	case MUL_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_nums;
+		_xdr_result = (xdrproc_t) xdr_nums;
+		local = (char *(*)(char *, struct svc_req *)) mul_vector_1_svc;
+		break;
+
+	case MOD_VECTOR:
+		_xdr_argument = (xdrproc_t) xdr_nums;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) mod_vector_1_svc;
+		break;
+
+	case SUM_MATRIX:
+		_xdr_argument = (xdrproc_t) xdr_matrix_group;
+		_xdr_result = (xdrproc_t) xdr_matrix;
+		local = (char *(*)(char *, struct svc_req *)) sum_matrix_1_svc;
+		break;
+
+	case SUB_MATRIX:
+		_xdr_argument = (xdrproc_t) xdr_matrix_group;
+		_xdr_result = (xdrproc_t) xdr_matrix;
+		local = (char *(*)(char *, struct svc_req *)) sub_matrix_1_svc;
+		break;
+
+	case MUL_MATRIX:
+		_xdr_argument = (xdrproc_t) xdr_matrix_group;
+		_xdr_result = (xdrproc_t) xdr_matrix;
+		local = (char *(*)(char *, struct svc_req *)) mul_matrix_1_svc;
+		break;
+
+	case MOD_MATRIX:
+		_xdr_argument = (xdrproc_t) xdr_matrix;
+		_xdr_result = (xdrproc_t) xdr_float;
+		local = (char *(*)(char *, struct svc_req *)) mod_matrix_1_svc;
 		break;
 
 	default:
@@ -84,6 +257,8 @@ main (int argc, char **argv)
 	register SVCXPRT *transp;
 
 	pmap_unset (CALCPROG, CALCSIMPLEVER);
+	pmap_unset (CALCADVANCEDPROG, CALCADVANVER);
+	pmap_unset (CALCVECTORMATRIXPROG, CALCVMVER);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
@@ -94,6 +269,14 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "unable to register (CALCPROG, CALCSIMPLEVER, udp).");
 		exit(1);
 	}
+	if (!svc_register(transp, CALCADVANCEDPROG, CALCADVANVER, calcadvancedprog_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (CALCADVANCEDPROG, CALCADVANVER, udp).");
+		exit(1);
+	}
+	if (!svc_register(transp, CALCVECTORMATRIXPROG, CALCVMVER, calcvectormatrixprog_1, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (CALCVECTORMATRIXPROG, CALCVMVER, udp).");
+		exit(1);
+	}
 
 	transp = svctcp_create(RPC_ANYSOCK, 0, 0);
 	if (transp == NULL) {
@@ -102,6 +285,14 @@ main (int argc, char **argv)
 	}
 	if (!svc_register(transp, CALCPROG, CALCSIMPLEVER, calcprog_1, IPPROTO_TCP)) {
 		fprintf (stderr, "%s", "unable to register (CALCPROG, CALCSIMPLEVER, tcp).");
+		exit(1);
+	}
+	if (!svc_register(transp, CALCADVANCEDPROG, CALCADVANVER, calcadvancedprog_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (CALCADVANCEDPROG, CALCADVANVER, tcp).");
+		exit(1);
+	}
+	if (!svc_register(transp, CALCVECTORMATRIXPROG, CALCVMVER, calcvectormatrixprog_1, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (CALCVECTORMATRIXPROG, CALCVMVER, tcp).");
 		exit(1);
 	}
 

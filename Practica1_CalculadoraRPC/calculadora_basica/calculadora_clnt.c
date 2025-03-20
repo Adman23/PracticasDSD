@@ -25,13 +25,13 @@ sum_1(nums *argp, CLIENT *clnt)
 }
 
 int *
-sub_1(operands *argp, CLIENT *clnt)
+sub_1(nums *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, SUB,
-		(xdrproc_t) xdr_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
@@ -55,13 +55,238 @@ mult_1(nums *argp, CLIENT *clnt)
 }
 
 float *
-div_1(operands *argp, CLIENT *clnt)
+div_1(nums *argp, CLIENT *clnt)
 {
 	static float clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, DIV,
-		(xdrproc_t) xdr_operands, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+sufix_1(char **argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SUFIX,
+		(xdrproc_t) xdr_wrapstring, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+power_1(oper *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, POWER,
+		(xdrproc_t) xdr_oper, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+sqrt_1(oper *argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SQRT,
+		(xdrproc_t) xdr_oper, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+mod_1(oper *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOD,
+		(xdrproc_t) xdr_oper, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+gcd_1(oper *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, GCD,
+		(xdrproc_t) xdr_oper, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+fibonacci_1(float *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, FIBONACCI,
+		(xdrproc_t) xdr_float, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+nums *
+sum_vector_1(matrix *argp, CLIENT *clnt)
+{
+	static nums clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SUM_VECTOR,
+		(xdrproc_t) xdr_matrix, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+nums *
+sub_vector_1(matrix *argp, CLIENT *clnt)
+{
+	static nums clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SUB_VECTOR,
+		(xdrproc_t) xdr_matrix, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+nums *
+cross_vector_1(matrix *argp, CLIENT *clnt)
+{
+	static nums clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, CROSS_VECTOR,
+		(xdrproc_t) xdr_matrix, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+nums *
+mul_vector_1(nums *argp, CLIENT *clnt)
+{
+	static nums clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MUL_VECTOR,
+		(xdrproc_t) xdr_nums, (caddr_t) argp,
+		(xdrproc_t) xdr_nums, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+mod_vector_1(nums *argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOD_VECTOR,
+		(xdrproc_t) xdr_nums, (caddr_t) argp,
+		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+matrix *
+sum_matrix_1(matrix_group *argp, CLIENT *clnt)
+{
+	static matrix clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SUM_MATRIX,
+		(xdrproc_t) xdr_matrix_group, (caddr_t) argp,
+		(xdrproc_t) xdr_matrix, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+matrix *
+sub_matrix_1(matrix_group *argp, CLIENT *clnt)
+{
+	static matrix clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, SUB_MATRIX,
+		(xdrproc_t) xdr_matrix_group, (caddr_t) argp,
+		(xdrproc_t) xdr_matrix, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+matrix *
+mul_matrix_1(matrix_group *argp, CLIENT *clnt)
+{
+	static matrix clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MUL_MATRIX,
+		(xdrproc_t) xdr_matrix_group, (caddr_t) argp,
+		(xdrproc_t) xdr_matrix, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+float *
+mod_matrix_1(matrix *argp, CLIENT *clnt)
+{
+	static float clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MOD_MATRIX,
+		(xdrproc_t) xdr_matrix, (caddr_t) argp,
 		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);

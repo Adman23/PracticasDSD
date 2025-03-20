@@ -2,7 +2,7 @@
  * Autor: Adam Navarro Megías
  */
 
-
+#include <ctype.h>
 #include "calculadora.h"
 
 // El indice de las operaciones va igual que lo definido
@@ -10,13 +10,13 @@
 // Se controla automático, no necesita indicarlo el usuario
 
 void
-calcprog_1(char *host, int operation, operands op, nums list)
+calcprog_1(char *host, int operation, nums *list)
 {
 	/* Se definen las siguientes estructuras, pero no se usarán todas, dependerá de el procedimiento*/
 	CLIENT *clnt;
 	int  *result_int;
 	float *result_float;
-
+	
 #ifndef	DEBUG
 	clnt = clnt_create (host, CALCPROG, CALCSIMPLEVER, "udp");
 	if (clnt == NULL) {
@@ -27,26 +27,26 @@ calcprog_1(char *host, int operation, operands op, nums list)
 
 	switch (operation)
 	{
-	case 1: result_int = sum_1(&list, clnt);
+	case 1: result_int = sum_1(list, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "sum call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
-	case 2: result_int = sub_1(&op, clnt);
+	case 2: result_int = sub_1(list, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "sub call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
-	case 3: result_int = mult_1(&list, clnt);
+	case 3: result_int = mult_1(list, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "mult call failed");
 			}
 			printf("Result: %d\n", *result_int);
 			break;
 
-	case 4: result_float = div_1(&op, clnt);
+	case 4: result_float = div_1(list, clnt);
 			if (result_float == (float *) NULL) {
 				clnt_perror (clnt, "div call failed");
 			}
@@ -58,7 +58,94 @@ calcprog_1(char *host, int operation, operands op, nums list)
 			exit(1);
 	}
 
-	free(list.nums_val);
+	free(list->nums_val);
+
+#ifndef	DEBUG
+	clnt_destroy (clnt);
+#endif	 /* DEBUG */
+}
+
+
+void
+calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
+{
+	/* Se definen las siguientes estructuras, pero no se usarán todas, dependerá de el procedimiento*/
+	CLIENT *clnt;
+	int  *result_int;
+	float *result_float;
+
+	perror("pre");
+	char tmp[50];
+				sprintf(tmp, "oper.base en funcion: |%f|", oper->base);
+	perror(tmp);
+	perror("post");
+
+#ifndef	DEBUG
+	clnt = clnt_create (host, CALCADVANCEDPROG, CALCADVANVER, "udp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+#endif	/* DEBUG */
+
+	switch (operation)
+	{
+	case 1: // SUFIX
+			result_float = sufix_1(&string, clnt); 
+			if (result_float == (int *) NULL) {
+				clnt_perror (clnt, "sufix call failed");
+			}
+			printf("Result: %f\n", *result_float);
+			break;
+
+	case 2: // POWER
+			result_int = power_1(oper, clnt);
+			if (result_int == (int *) NULL) {
+				clnt_perror (clnt, "pow call failed");
+			}
+			printf("Result: %d\n", *result_int);
+			break;
+
+	case 3: // SQRT
+			result_float = sqrt_1(oper, clnt); 
+			if (result_float == (int *) NULL) {
+				clnt_perror (clnt, "sqrt call failed");
+			}
+			printf("Result: %f\n", *result_float);
+			break;
+
+	case 4: // MOD
+			result_int = mod_1(oper, clnt);
+			if (result_int == (int *) NULL) {
+				clnt_perror (clnt, "mod call failed");
+			}
+			printf("Result: %d\n", *result_int);
+			break;
+
+	case 5: // GCD
+			result_int = gcd_1(oper, clnt);
+			if (result_int == (int *) NULL) {
+				clnt_perror (clnt, "gcd call failed");
+			}
+			printf("Result: %d\n", *result_int);
+			break;
+
+	case 6: // FIBONACCI		
+			perror("pre-oper"); 
+			int * value = (int)oper->base;
+			char tmp2[50];
+			sprintf(tmp2, "oper.base en case: |%f|", *value);
+			perror(*value);
+			result_int = fibonacci_1(value, clnt);
+			if (result_int == (int *) NULL) {
+				clnt_perror (clnt, "fibonacci call failed");
+			}
+			printf("Result: %d\n", *result_int);
+			break;
+
+	default:perror("not a valid operation index");
+			exit(1);
+	}
 
 #ifndef	DEBUG
 	clnt_destroy (clnt);
@@ -131,21 +218,52 @@ check_help(char* arg1, char* arg2)
 
 // Función recursiva par a verificar si se han introducido dígitos o hay caracteres
 int is_number(const char *str) {
-
+	static int has_decimal_point = 0;
 	// str comienza al principio de la cadena (la cadena será idealmente un número)
     // El número puede ser negativo, se salta el signo
-    if (*str == '-') 
+    if (*str == '-')
         str++;    
-
+	if (*str == '\0') { // No puede estar vacía despues de saltar el signo
+		return 0;
+	}	
+	
     // Bucle recursivo para verificar si cada carácter es dígito
     while (*str) {
-        if (!isdigit(*str)) 
+		if (*str == '.' && has_decimal_point) {
+			return 0; // Tendría más de un punto
+		}
+		else 
+		if (*str == '.') 
+			has_decimal_point = 1;
+		else
+        if (!isdigit((unsigned char)*str)) 
             return 0; // No es un número
 
         str++;
     }
 
     return 1; // Es un número válido
+}
+
+void parse_data_advancecalc(char *token1, char *token2, oper *oper)
+{
+	char *endptr; // Puntero en el que strtof pondrá el último carácter convertido, que debería de ser \0
+	oper->base = strtof (token1, &endptr);
+	if (*endptr != '\0') 
+	{
+		printf("Error: strtof(1) failed\n");
+		exit(1);
+	}
+	oper->operator = strtof (token2, &endptr);
+	if (*endptr != '\0') 
+	{
+		printf("Error: strtof(2) failed\n");
+		exit(1);
+	}
+	if (oper->operator < 0 || !is_number(token1) || !is_number(token2)) {
+		printf("Error: not a number or negative exponent: %f ^ %f\n", oper->base, oper->operator);
+		exit(1);
+	}
 }
 
 
@@ -156,9 +274,11 @@ main (int argc, char *argv[])
 
 	/* Definición de variables y estructuras */
 	
-	operands op = {0, 0};
 	nums list = {0, NULL};
-	
+	oper oper = {0.0, 0.0};
+	char *string = NULL;
+
+
 	if (argc < 2) {
 		printf ("Use: %s server_host\n", argv[0]);
 		printf ("Use: %s server_host -h, to see all modes\n", argv[0]);
@@ -233,7 +353,7 @@ main (int argc, char *argv[])
 			exit (1);
 		}
 		char operation = token[0];
-
+		
 		// Comprobamos la validez de la operación
 		switch (operation)
 		{
@@ -243,12 +363,11 @@ main (int argc, char *argv[])
 			perror("not a valid operation symbol (only +, -, *, /)");
 			exit(1);
 		}
-
+		
 
 		// list -> de números, struct definido en el .x
 		list.nums_len = 0; // Reservamos memoria para 10 que es el máximo, si hay menos da igual
 		list.nums_val = (int *) malloc (10 * sizeof(int));
-
 		// Parseamos los tokens a operandos
 		while ((token = strtok(NULL, " ")) != NULL) { // Extraer los operandos
 			// Comprobamos aqui el límite de 10, porque en esta ejecución intentaría asignar 
@@ -257,7 +376,6 @@ main (int argc, char *argv[])
 				printf("Too many operands, max 10\n");
 				exit(1);
 			}
-
 			if (!is_number(token)) {
 				printf("Found a non-number operand: %s\n", token);
 				exit(1);
@@ -270,7 +388,7 @@ main (int argc, char *argv[])
 			printf ("Error: not enough operands!\n");
 			exit (1);
 		}
-
+		
 		// Comprobaciones finales para guardar datos en las estructuras pertinentes
 		switch (operation)
 		{
@@ -279,38 +397,117 @@ main (int argc, char *argv[])
 								printf ("Error: too many operands!\n");
 								exit (1);
 							}
-							op.op1 = list.nums_val[0];
-							op.op2 = list.nums_val[1];
 							break;
 		case '*': case '+': break;
 		default:printf ("not a valid operation\n");
 				exit (1);
 		}
+		
 	
 		switch (operation)
 		{
-			case '+': calcprog_1 (host, 1, op, list);
+			case '+': calcprog_1 (host, 1,&list);
 					break;
-			case '-': calcprog_1 (host, 2, op, list);
+			case '-': calcprog_1 (host, 2,&list);
 					break;
-			case '*': calcprog_1 (host, 3, op, list);
+			case '*': calcprog_1 (host, 3,&list);
 					break;
-			case '/': calcprog_1 (host, 4, op, list);
+			case '/': calcprog_1 (host, 4,&list);
 					break;
 		}
 
-		break;
+		
+		break; // Termina el modo basico------------------------------------------------------------
 		}
 
 	case 'a':
+		{
 		if (strcmp(mode, "advanced") != 0) {
 			perror("not a valid mode");
 			exit(1);
 		}
-		printf ("not implemented\n");
-		exit (1);
-		break;
+		printf("Options:\n");
+		printf("^ base exponent -> power\n");
+		printf("sqrt base root_exponent -> square root\n");
+		printf("sufix a b c * + D + -> the characters are numbers, this is an operation in sufix\n");
+		printf("mod n -> divider dividend -> Module operation (gives the remainder)\n");
+		printf("gdc a b -> Greatest common divisor between \"a\" and \"b\"\n");
+		printf("fibonacci n -> Fibonacci number at position \"n\" \"n\"\n");
+
+		printf ("\nInput your choice. (Only one):\n");
+		fgets(input, sizeof(input), stdin);
+		input[strcspn(input, "\n")] = '\0'; // Eliminamos el salto de línea, que luego da problemas
+
+		// Extraemos la operación
+		char *token = strtok(input, " ");
 	
+
+		if (strcmp(token, "sufix") == 0 ) // Modo avanzado para cadena sufija
+		{	
+			token = strtok(NULL, "\0");
+			// Llamar al programa con &input como string (debería de tener el resto de la cadena)
+			// Será el servidor el encargado de verificar que está correcta
+			calcadvancedprog_1(host, 1, &oper, token);
+		}	
+		else
+		if (strcmp(token, "fibonacci") == 0 )
+		{
+			token = strtok(NULL, " ");
+			if (!is_number(token)) {
+				printf("Error: not a number\n");
+				exit(1);
+			}
+			else
+			{
+				char *endptr; // Puntero en el que strtof pondrá el último carácter convertido, que debería de ser \0
+				oper.base = strtof (token, &endptr);
+				char tmp[50];
+				sprintf(tmp, "oper.base en main: |%f|", oper.base);
+				if (*endptr != '\0') 
+				{
+					printf("Error: strtof(0) failed\n");
+					exit(1);
+				} // Extraemos n de la cadena (no estamos verificando que haya más)
+				calcadvancedprog_1 (host, 6, &oper, input); // Llamar al procedimiento con n
+			}
+		}
+		else
+		{
+			switch (token[0])
+			{
+			case '^': 	if (strlen(token) == 1){
+							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							calcadvancedprog_1 (host, 2, &oper, input);
+						}		
+						else
+							printf ("not a valid operation\n");
+						break;
+			case 's': 	if (strcmp(token, "sqrt") == 0){
+							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							calcadvancedprog_1 (host, 3, &oper, input);
+						}		
+						else
+							printf ("not a valid operation\n");
+			case 'm': 	if (strcmp(token, "mod") == 0){
+							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							calcadvancedprog_1 (host, 4, &oper, input);
+						}		
+						else
+							printf ("not a valid operation\n");
+			case 'g': 	if (strcmp(token, "gdc") == 0){
+							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							calcadvancedprog_1 (host, 5, &oper, input);
+						}		
+						else
+							printf ("not a valid operation\n");						
+			default:
+				break;
+			}
+		}
+		break; // Termina el modo avanzado----------------------------------------------------------
+		}
+
+
 	case 'f':
 		if (strcmp(mode, "file") != 0) {
 			perror("not a valid mode");

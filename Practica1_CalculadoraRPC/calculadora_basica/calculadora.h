@@ -91,8 +91,8 @@ extern  int * mod_1_svc(oper *, struct svc_req *);
 extern  int * gcd_1(oper *, CLIENT *);
 extern  int * gcd_1_svc(oper *, struct svc_req *);
 #define FIBONACCI 6
-extern  int * fibonacci_1(float *, CLIENT *);
-extern  int * fibonacci_1_svc(float *, struct svc_req *);
+extern  int * fibonacci_1(int *, CLIENT *);
+extern  int * fibonacci_1_svc(int *, struct svc_req *);
 extern int calcadvancedprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */

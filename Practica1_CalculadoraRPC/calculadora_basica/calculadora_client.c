@@ -74,12 +74,6 @@ calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
 	int  *result_int;
 	float *result_float;
 
-	perror("pre");
-	char tmp[50];
-				sprintf(tmp, "oper.base en funcion: |%f|", oper->base);
-	perror(tmp);
-	perror("post");
-
 #ifndef	DEBUG
 	clnt = clnt_create (host, CALCADVANCEDPROG, CALCADVANVER, "udp");
 	if (clnt == NULL) {
@@ -115,11 +109,12 @@ calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
 			break;
 
 	case 4: // MOD
+			printf("El primer valor es: %f y el segundo %f", oper->base, oper->operator);
 			result_int = mod_1(oper, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "mod call failed");
 			}
-			printf("Result: %d\n", *result_int);
+			printf("Result mod : %d\n", *result_int);
 			break;
 
 	case 5: // GCD
@@ -131,12 +126,11 @@ calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
 			break;
 
 	case 6: // FIBONACCI		
-			perror("pre-oper"); 
-			int * value = (int)oper->base;
-			char tmp2[50];
-			sprintf(tmp2, "oper.base en case: |%f|", *value);
-			perror(*value);
-			result_int = fibonacci_1(value, clnt);
+			int value = (int)oper->base;
+			int * value_pointer = &value;
+			*value_pointer = value;
+
+			result_int = fibonacci_1(value_pointer, clnt);
 			if (result_int == (int *) NULL) {
 				clnt_perror (clnt, "fibonacci call failed");
 			}
@@ -247,6 +241,18 @@ int is_number(const char *str) {
 
 void parse_data_advancecalc(char *token1, char *token2, oper *oper)
 {
+	if (token1==NULL || token2==NULL)
+	{
+		printf("Not enough operands!\n");
+		exit(1);
+	}
+	else
+	if (strtok(NULL, " ") != NULL)
+	{
+		printf("Too many operands!\n");
+		exit(1);
+	}
+
 	char *endptr; // Puntero en el que strtof pondrá el último carácter convertido, que debería de ser \0
 	oper->base = strtof (token1, &endptr);
 	if (*endptr != '\0') 
@@ -430,9 +436,9 @@ main (int argc, char *argv[])
 		printf("^ base exponent -> power\n");
 		printf("sqrt base root_exponent -> square root\n");
 		printf("sufix a b c * + D + -> the characters are numbers, this is an operation in sufix\n");
-		printf("mod n -> divider dividend -> Module operation (gives the remainder)\n");
+		printf("mod divider dividend -> Module operation (gives the remainder)\n");
 		printf("gdc a b -> Greatest common divisor between \"a\" and \"b\"\n");
-		printf("fibonacci n -> Fibonacci number at position \"n\" \"n\"\n");
+		printf("fibonacci n -> Fibonacci number at position \"n\"\n");
 
 		printf ("\nInput your choice. (Only one):\n");
 		fgets(input, sizeof(input), stdin);
@@ -461,8 +467,6 @@ main (int argc, char *argv[])
 			{
 				char *endptr; // Puntero en el que strtof pondrá el último carácter convertido, que debería de ser \0
 				oper.base = strtof (token, &endptr);
-				char tmp[50];
-				sprintf(tmp, "oper.base en main: |%f|", oper.base);
 				if (*endptr != '\0') 
 				{
 					printf("Error: strtof(0) failed\n");
@@ -473,33 +477,38 @@ main (int argc, char *argv[])
 		}
 		else
 		{
+			char * token1 = strtok(NULL, " ");
+			char * token2 = strtok(NULL, " ");
 			switch (token[0])
 			{
 			case '^': 	if (strlen(token) == 1){
-							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							parse_data_advancecalc(token1, token2, &oper);
 							calcadvancedprog_1 (host, 2, &oper, input);
 						}		
 						else
 							printf ("not a valid operation\n");
 						break;
 			case 's': 	if (strcmp(token, "sqrt") == 0){
-							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							parse_data_advancecalc(token1, token2, &oper);
 							calcadvancedprog_1 (host, 3, &oper, input);
 						}		
 						else
 							printf ("not a valid operation\n");
+						break;
 			case 'm': 	if (strcmp(token, "mod") == 0){
-							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							parse_data_advancecalc(token1, token2, &oper);
 							calcadvancedprog_1 (host, 4, &oper, input);
 						}		
 						else
 							printf ("not a valid operation\n");
+						break;
 			case 'g': 	if (strcmp(token, "gdc") == 0){
-							parse_data_advancecalc(strtok(NULL, " "), strtok(NULL, " "), &oper);
+							parse_data_advancecalc(token1, token2, &oper);
 							calcadvancedprog_1 (host, 5, &oper, input);
 						}		
 						else
-							printf ("not a valid operation\n");						
+							printf ("not a valid operation\n");		
+						break;				
 			default:
 				break;
 			}

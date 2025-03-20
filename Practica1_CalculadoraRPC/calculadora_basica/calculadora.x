@@ -39,7 +39,7 @@ program CALCADVANCEDPROG{
         float SQRT(oper) = 3; 
         int MOD(oper) = 4;
         int GCD(oper) = 5;
-        int FIBONACCI(float) = 6;
+        int FIBONACCI(int) = 6;
     } = 1;
 } = 0x20000002; 
 

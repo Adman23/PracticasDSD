@@ -103,25 +103,32 @@ float top(stack *s){
 
 // Función recursiva par a verificar si se han introducido dígitos o hay caracteres
 int is_number(const char *str) {
-
+	static int has_decimal_point = 0;
 	// str comienza al principio de la cadena (la cadena será idealmente un número)
     // El número puede ser negativo, se salta el signo
-    if (*str == '-') 
+    if (*str == '-')
         str++;    
+
+	if (*str == '\0') { // No puede estar vacía despues de saltar el signo
+		return 0;
+	}	
 	
     // Bucle recursivo para verificar si cada carácter es dígito
     while (*str) {
-		if (*str == '.') {
-			return is_number(str + 1); // Si hay un punto, se salta y se sigue verificando
+		if (*str == '.' && has_decimal_point) {
+			return 0; // Tendría más de un punto
 		}
-
-        if (!is_number(str)) 
+		else 
+		if (*str == '.') 
+			has_decimal_point = 1;
+		else
+        if (!isdigit(*str))
+		{
             return 0; // No es un número
-
+		}
         str++;
     }
-	
-    return 1; // Es un número válido
+	return 1; // Si es un numero
 }
 
 float *
@@ -131,30 +138,23 @@ sufix_1_svc(char **string, struct svc_req *rqstp)
 	result = 0;
 	stack s;
 	init_stack(&s);
-	char ** endptr; // Puntero para strtof que apunta donde termina la cadena que transforma
-	
-	// Inciamos obteniendo primer token (Tiene que ser un número si o si)
-	char *token = strtok(*string, " ");
-	if (!is_number(token)){
-		printf("Cadena sufija inválida\n");
-		result = -1;
-		return &result;
-	}
+	char * endptr; // Puntero para strtof que apunta donde termina la cadena que transforma
 
 	// Hacemos bucle extrayendo todos los tokens de la cadena
 	// Cada número que se encuentre se manda a la pila, cada operación se hace con los dos números superiores
 	// Si se da el caso de encontrar operación y no haber números en la pila suficientes --> Error
 	// Si se da el caso de tener la pila con números y terminar la cadena --> Error
 	// Si se da el caso de meter en la pila pero está llena --> Error (Este es error por la implementación, mayor tamaño daría margen a operaciones más grandes -> max 10)
+	char *token = strtok(*string, " ");
 	while (token != NULL)
 	{
 		if (is_number(token)){
-			if (push(&s, strtof(token, endptr)) == -1){
+			if (push(&s, strtof(token, &endptr)) == -1){
 				printf("Error: Pila llena\n");
 				result = -1;
 				return &result;
 			}
-			if (**endptr == '\0')
+			if (*endptr != '\0')
 			{
 				printf("Error: strtof(server) failed\n");
 				result = -1;
@@ -162,7 +162,8 @@ sufix_1_svc(char **string, struct svc_req *rqstp)
 			}
 		}
 		else{
-			if (s.top > 1){
+			if (s.top >= 1)
+			{
 				int op2 = pop(&s);
 				int op1 = pop(&s);
 				switch (token[0]){
@@ -176,6 +177,7 @@ sufix_1_svc(char **string, struct svc_req *rqstp)
 									result = -1;
 									return &result;
 								}
+								break;
 					default: printf("Operación no válida\n"); break;
 				}
 			}
@@ -185,7 +187,11 @@ sufix_1_svc(char **string, struct svc_req *rqstp)
 				return &result;
 			}
 		}
+		token = strtok(NULL, " ");
 	}
+	// Si todo ha salido correcto solo debe haber un elemento en la pila que será el resultado
+	result = s.elements[0];
+	return &result;
 }
 
 int *
@@ -238,7 +244,10 @@ mod_1_svc(oper *op, struct svc_req *rqstp)
 		return &result;
 	}
 
-	result = (int)op->base % (int)op->operator;
+	int op1 = (int)op->base;
+	int op2 = (int)op->operator;
+
+	result = op1 % op2;
 
 	return &result;
 }
@@ -266,38 +275,34 @@ gcd_1_svc(oper *op, struct svc_req *rqstp)
 }
 
 int *
-fibonacci_1_svc(float *n, struct svc_req *rqstp)
+fibonacci_1_svc(int *n, struct svc_req *rqstp)
 {
-	perror("pre2");
-	char tmp[50];
-				sprintf(tmp, "oper.base en server: |%f|", *n);
-
-	perror("post2");
 	static int result;
-	result = 0;
+	result = 0;	
 
 	if (*n < 0){
 		printf("Error: Número negativo\n");
 		result = -1;
 		return &result;
 	}
-	perror("step1");
+
 
 	// Caso de 0 o 1 pues es 1 
 	if (*n == 0){
-		perror("step1.1");
 		result = 0;
+
 		return &result;
 	}
 	else
 	if (*n == 1){
-		perror("step1.2");
 		result = 1;
+
 		return &result;
 	}
 	else // Cualquier otro caso aplicamos la secuencia de fibonacci result(n) = result(n-1) + result(n-2) (0, 1, 1, 2, 3, 5, 8, 13, 21, 34...)
 	{
-		perror("step2");
+
+	perror("step5");
 		int a = 0;
 		int b = 1;
 		int c;
@@ -307,10 +312,10 @@ fibonacci_1_svc(float *n, struct svc_req *rqstp)
 			b = c;
 		}
 		result = c;
-		perror("step3");
+
+	perror("step6");
 	}
 
-	perror("step4");
 
 	return &result;
 }

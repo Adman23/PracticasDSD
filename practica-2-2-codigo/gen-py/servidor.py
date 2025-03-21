@@ -1,7 +1,7 @@
 import glob
 import sys
 
-import Calculadora
+from calculadora import Calculadora
 
 from thrift.transport import TSocket
 from thrift.transport import TTransport

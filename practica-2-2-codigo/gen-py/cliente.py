@@ -1,4 +1,4 @@
-import Calculadora
+from calculadora import Calculadora
 
 from thrift import Thrift
 from thrift.transport import TSocket

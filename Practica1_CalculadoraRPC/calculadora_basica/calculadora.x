@@ -13,6 +13,7 @@ const MAX = 10; /* Máximo de 10 operandos */
 typedef int nums<MAX>; /* Listado de int que son los operandos */
 typedef nums matrix<MAX>; /* Doble listado de int (matriz) */
 
+
 struct matrix_group{
     matrix m1;
     matrix m2;

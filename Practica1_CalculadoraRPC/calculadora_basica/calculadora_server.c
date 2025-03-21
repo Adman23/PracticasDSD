@@ -373,10 +373,61 @@ mod_vector_1_svc(nums * v, struct svc_req *rqstp)
 	return &result;
 }
 
+// Las matrices tienen que ser de igual dimensión
 matrix *
 sum_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 {
-	static matrix result = {0,{0,NULL}};
+	static matrix result;
+	xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val));
+	result.matrix_val = NULL;
+	result.matrix_len = 0;
+	
+
+	// Asignamos memoria pertinente para esta operación
+	result.matrix_len = mg->m1.matrix_len;
+	result.matrix_val = (nums *)malloc(mg->m1.matrix_len * sizeof(nums));
+	for (int i = 0; i < mg->m1.matrix_len; i++) {
+		result.matrix_val[i].nums_len = mg->m1.matrix_val[i].nums_len;
+		result.matrix_val[i].nums_val = (int *)malloc(result.matrix_val[i].nums_len * sizeof(int));
+	}
+
+	char tmp[50];
+
+	sprintf(tmp," %d ", mg->m1.matrix_val[0].nums_val[0]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m1.matrix_val[0].nums_val[1]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m1.matrix_val[1].nums_val[0]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m1.matrix_val[1].nums_val[1]);
+
+	sprintf(tmp," %d ", mg->m2.matrix_val[0].nums_val[0]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m2.matrix_val[0].nums_val[1]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m2.matrix_val[1].nums_val[0]);
+	perror(tmp);
+	sprintf(tmp," %d ", mg->m2.matrix_val[1].nums_val[1]);
+	
+
+
+	// Verificamos que las dimensiones de las matrices son iguales
+	// Comprobamos que tengan el mismo número de filas y luego que las primeras filas tengan el mismo número de columnas
+	// Asumimos que las matrices son matrices, es decir, las filas tienen la misma longitud en la misma matriz
+	if (mg->m1.matrix_len != mg->m2.matrix_len || mg->m1.matrix_val[0].nums_len != mg->m2.matrix_val[0].nums_len)
+	{
+		perror("Matrices no tienen las mismas dimensiones");
+	}
+	else
+	{
+		// Sumamos las matrices dentro del grupo
+		for (int i = 0; i < mg->m1.matrix_len; i++)
+			for (int j = 0; j <  mg->m1.matrix_val[i].nums_len; j++)
+				result.matrix_val[i].nums_val[j] = mg->m1.matrix_val[i].nums_val[j] + mg->m2.matrix_val[i].nums_val[j];
+		
+	}
+
+
 	return &result;
 }
 
@@ -384,7 +435,36 @@ sum_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 matrix *
 sub_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 {
-	static matrix result = {0,{0,NULL}};
+	static matrix result;
+	result.matrix_val = NULL;
+	result.matrix_len = 0;
+	
+	if (result.matrix_val != NULL)
+		xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val)); // Liberamos memoria de otras ejecuciones de la operacion
+
+	// Asignamos memoria pertinente para esta operación
+	result.matrix_len = mg->m1.matrix_len;
+	result.matrix_val = (nums *)malloc(mg->m1.matrix_len * sizeof(nums));
+	for (int i = 0; i < mg->m1.matrix_len; i++) {
+		result.matrix_val[i].nums_len = mg->m1.matrix_val[i].nums_len;
+		result.matrix_val[i].nums_val = (int *)malloc(result.matrix_val[i].nums_len * sizeof(int));
+	}
+	
+	// Verificamos que las dimensiones de las matrices son iguales
+	// Comprobamos que tengan el mismo número de filas y luego que las primeras filas tengan el mismo número de columnas
+	// Asumimos que las matrices son matrices, es decir, las filas tienen la misma longitud en la misma matriz
+	if (mg->m1.matrix_len != mg->m2.matrix_len || mg->m1.matrix_val[0].nums_len != mg->m2.matrix_val[0].nums_len)
+	{
+		perror("The matrixes doesnt have equal size!");
+	}
+	else
+	{
+		// Sumamos las matrices dentro del grupo
+		for (int i = 0; i < mg->m1.matrix_len; i++)
+			for (int j = 0; j < mg->m1.matrix_val[0].nums_len;j++)
+				result.matrix_val[i].nums_val[j] = mg->m1.matrix_val[i].nums_val[j] - mg->m2.matrix_val[i].nums_val[j];
+	}
+
 	return &result;
 }
 
@@ -392,14 +472,42 @@ sub_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 matrix *
 mul_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 {
-	static matrix result = {0,{0,NULL}};
-	return &result;
-}
+	static matrix result;
+	result.matrix_val = NULL;
+	result.matrix_len = 0;
+	
+	if (result.matrix_val != NULL)
+		xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val)); // Liberamos memoria de otras ejecuciones de la operacion
 
-float *
-mod_matrix_1_svc(matrix * m, struct svc_req *rqstp)
-{
-	static float result; 
-	result = 0;
+
+	// Asignamos memoria pertinente para esta operación
+	result.matrix_len = mg->m1.matrix_len;
+	result.matrix_val = (nums *)malloc(mg->m1.matrix_len * sizeof(nums));
+	for (int i = 0; i < mg->m1.matrix_len; i++) {
+		result.matrix_val[i].nums_len = mg->m2.matrix_val[i].nums_len;
+		result.matrix_val[i].nums_val = (int *)malloc(result.matrix_val[i].nums_len * sizeof(int));
+	}
+
+	// Tenemos que verificar que se cumpla la propiedad de que en A x B, la matriz A tiene un número de columnas n y la matriz
+	// B tiene un número de filas n, los otros dos valores si pueden ser distintos. Las filas y columnas de A y B respectivamente 
+	// lo que harán es determinar el tamaño de la matriz resultante
+	if (mg->m1.matrix_val[0].nums_len != mg->m2.matrix_len)
+	{
+		perror("The columns of the first matrix and rows of the second one are different!");
+	}
+	else
+	{	
+		int tmp = 0;
+		for (int i = 0; i < mg->m1.matrix_len; i++){ // Recorremos las filas de m1 primero
+			for (int j = 0; j < mg->m2.matrix_val[0].nums_len; j++){	// Luego para cada fila de m1 recorremos todas las columnas de m2
+				for(int z = 0; z < mg->m2.matrix_len; z++){ // Por último, para cada fila m1 por cada columna de m2, recorremos el valor n (columnas m1=filas m2)
+					tmp += mg->m1.matrix_val[i].nums_val[z] * mg->m2.matrix_val[z].nums_val[j];
+				}
+				result.matrix_val[i].nums_val[j] = tmp;
+				tmp = 0;
+			}
+		}
+	}
+
 	return &result;
 }

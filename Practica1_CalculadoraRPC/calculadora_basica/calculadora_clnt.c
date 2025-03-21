@@ -278,18 +278,3 @@ mul_matrix_1(matrix_group *argp, CLIENT *clnt)
 	}
 	return (&clnt_res);
 }
-
-float *
-mod_matrix_1(matrix *argp, CLIENT *clnt)
-{
-	static float clnt_res;
-
-	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, MOD_MATRIX,
-		(xdrproc_t) xdr_matrix, (caddr_t) argp,
-		(xdrproc_t) xdr_float, (caddr_t) &clnt_res,
-		TIMEOUT) != RPC_SUCCESS) {
-		return (NULL);
-	}
-	return (&clnt_res);
-}

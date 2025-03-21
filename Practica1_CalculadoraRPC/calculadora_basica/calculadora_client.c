@@ -147,6 +147,59 @@ calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
 }
 
 
+
+
+
+void
+calcvectormatrixprog_1(char *host, int operation, matrix_group *mg, matrix *m)
+{
+	/* Se definen las siguientes estructuras, pero no se usarán todas, dependerá de el procedimiento*/
+	CLIENT *clnt;
+	matrix *result;
+
+#ifndef	DEBUG
+	clnt = clnt_create (host, CALCVECTORMATRIXPROG, CALCVMVER, "udp");
+	if (clnt == NULL) {
+		clnt_pcreateerror (host);
+		exit (1);
+	}
+#endif	/* DEBUG */
+
+	switch (operation)
+	{
+	case 1: break;
+	case 2: break;
+	case 3: break;
+	case 4: break;
+	case 5: break;
+
+	case 6: result = sum_matrix_1(mg, clnt);
+			break;
+	case 7: result = sub_matrix_1(mg, clnt);
+			break;
+	case 8: result = mul_matrix_1(mg, clnt);
+			break;
+
+	default:perror("not a valid operation index");
+			exit(1);
+	}
+
+	printf("Matriz resultante: \n\n");
+	for (int i = 0; i < result->matrix_len; i++){
+		for (int j = 0; j < result->matrix_val[0].nums_len; j++){
+			printf("%d ", result->matrix_val[i].nums_val[j]);
+		}
+		printf("\n");
+	}
+
+	xdr_free(xdr_nums, result->matrix_val);
+
+#ifndef	DEBUG
+	clnt_destroy (clnt);
+#endif	 /* DEBUG */
+}
+
+
 int 
 check_help(char* arg1, char* arg2)
 {
@@ -179,13 +232,15 @@ check_help(char* arg1, char* arg2)
 		else
 		if (strcmp(arg2, "advanced"))
 		{
-			printf ("Not implemented:\n");
+			printf ("Operaciones disponibles:\n");
+			printf ("  sufix : Conjunto de operaciones básicas en la misma ejecución, pero en  sufijo\n");
+			printf ("  ^ : Una base elevada a un exponente (multiplicada por si misma tantas veces)\n");
+			printf ("  sqrt : La raíz con exponente indicado (si es raíz cuadrada es el número^2 que da la base)\n");
+			printf ("  mod : Operación módulo, que devuelve el resto entero de la división\n");
+			printf ("  gcd : Máximo común divisor de dos números\n");
+			printf ("  fibonacci : El número \"n\" de la secuencia de fibonacci\n");
+			exit (1);
 		}
-		else
-		if (strcmp(arg2, "sufix"))
-		{
-			printf ("Not implemented:\n");
-		}	
 		else
 		if (strcmp(arg2, "file"))
 		{
@@ -199,7 +254,11 @@ check_help(char* arg1, char* arg2)
 		else
 		if (strcmp(arg2, "matrix"))
 		{
-			printf ("Not implemented:\n");
+			printf ("Operaciones disponibles:\n");
+			printf ("  + : Suma de dos matrices de igual dimensión\n");
+			printf ("  - : Resta de dos matrices de igual dimensión\n");
+			printf ("  * : Multiplicación de dos matrices compatibles\n");
+			exit (1);
 		}
 		else
 		{
@@ -239,6 +298,31 @@ int is_number(const char *str) {
     return 1; // Es un número válido
 }
 
+
+// Función recursiva par a verificar si se han introducido dígitos o hay caracteres, solo verifica int
+int is_number_int(const char *str) {
+	// str comienza al principio de la cadena (la cadena será idealmente un número)
+    // El número puede ser negativo, se salta el signo
+    if (*str == '-')
+        str++;    
+	if (*str == '\0') { // No puede estar vacía despues de saltar el signo
+		return 0;
+	}	
+	if (!str)
+		return 1; // Es nulo
+
+    // Bucle recursivo para verificar si cada carácter es dígito
+    while (*str) {
+        if (!isdigit((unsigned char)*str)) 
+            return 0; // No es un número
+        str++;
+    }
+
+    return 1; // Es un número válido
+}
+
+
+// Función para parsear datos para la calculadora avanzada
 void parse_data_advancecalc(char *token1, char *token2, oper *oper)
 {
 	if (token1==NULL || token2==NULL)
@@ -284,6 +368,16 @@ main (int argc, char *argv[])
 	oper oper = {0.0, 0.0};
 	char *string = NULL;
 
+	matrix_group matrix_g;
+	matrix_g.m1.matrix_len = 0;
+	matrix_g.m1.matrix_val = NULL;
+	matrix_g.m2.matrix_len = 0;
+	matrix_g.m2.matrix_len = NULL;
+
+	matrix matrix;
+	matrix.matrix_len = NULL;
+	matrix.matrix_val = NULL;
+
 
 	if (argc < 2) {
 		printf ("Use: %s server_host\n", argv[0]);
@@ -322,7 +416,7 @@ main (int argc, char *argv[])
 
 	// Leemos el modo de operación (solo lee la primera palabra)
 	char *mode = (char *) malloc (15 * sizeof(char));
-	printf ("Please input the mode to use: basic, advanced, sufix, file, vector, matrix:\n");
+	printf ("Please input the mode to use: basic, advanced, *file-NOT_IMPLEMENTED*, *vector-NOT_IMPLEMENTED*, matrix:\n");
 	scanf ("%14s", mode); // Lee un máximo de 14 caracteres y pone el último como \0
 
 	// Verificamos que la entrada ha sido solo una palabra
@@ -525,38 +619,191 @@ main (int argc, char *argv[])
 		printf ("not implemented\n");
 		exit (1);
 		break;
-	
-	case 's':
-		if (strcmp(mode, "sufix") != 0) {
-			perror("not a valid mode");
-			exit(1);
-		}
-		printf ("not implemented\n");
-		exit (1);
-		break;	
 
 	case 'v':
 		if (strcmp(mode, "vector") != 0) {
 			perror("not a valid mode");
 			exit(1);
 		}
+		
+
 		printf ("not implemented\n");
 		exit (1);
 		break;	
 	
 	case 'm':
+		{
 		if (strcmp(mode, "matrix") != 0) {
 			perror("not a valid mode");
 			exit(1);
 		}
-		printf ("not implemented\n");
-		exit (1);
+
+		// Solicitamos la operacion
+		printf("Press enter (\\n)");
+		int c;
+		while ((c = getchar()) != '\n' && c != EOF) {
+			// Descartar el carácter
+		}	
+
+		char operation;
+		printf ("Input the operation(- + *):\n");
+		scanf ("%c", &operation); // Lee un máximo de 1 caracter y pone el último como \0
+		
+		while ((c = getchar()) != '\n' && c != EOF) {
+        if (c != ' ') { // Se consumen palabras hasta ver si hay algo más que espacios
+            printf("Error: Se ingresaron más de una palabra.\n");
+            return 1;
+        }
+    }
+		// Comprobamos la validez de la operación
+		switch (operation)
+		{
+		case '+': case '-': case '*': case '/':
+			break;
+		default:
+			perror("not a valid operation symbol (only +, -, *, /)");
+			exit(1);
+		}
+		
+		char * token;
+		int row_m1 		= 0;
+		int column_m1 	= 0;
+		int row_m2 	 	= 0;
+		int column_m2 	= 0;
+		
+
+		// Recibimos por entrada los datos de las matrices
+		printf("Input the number of rows and columns of both matrixes -> row_m1 column_m1 row_m2 column_m2: ");
+		fgets(input, sizeof(input), stdin);
+		input[strcspn(input, "\n")] = '\0'; // Eliminamos el salto de línea, que luego da problemas
+
+
+		if ( is_number_int(token=strtok(input, " ")) ){
+			row_m1 = atoi(token);
+			if ( is_number_int(token=strtok(NULL, " ")) ){
+				column_m1 = atoi(token);
+				if ( is_number_int(token=strtok(NULL, " ")) ){
+					row_m2 = atoi(token);
+					if ( is_number_int(token=strtok(NULL, " ")) ){
+						column_m2 = atoi(token);
+					}
+					else{
+						printf("Invalid matrix size numbers");
+						exit(1);
+					}
+				}
+				else{
+					printf("Invalid matrix size numbers");
+					exit(1);
+				}
+			}
+			else{
+				printf("Invalid matrix size numbers");
+				exit(1);
+			}
+		}
+		else{
+			printf("Invalid matrix size numbers");
+			exit(1);
+		}
+		
+		// Reservamos la memoria para ambas matrices
+		matrix_g.m1.matrix_len = row_m1;
+		matrix_g.m1.matrix_val = (nums *)malloc(row_m1 * sizeof(nums));
+		for (int i = 0; i < row_m1; i++) {
+			matrix_g.m1.matrix_val[i].nums_len = column_m1;
+			matrix_g.m1.matrix_val[i].nums_val = (int *)malloc(column_m1 * sizeof(int));
+		}
+
+		matrix_g.m2.matrix_len = row_m2;
+		matrix_g.m2.matrix_val = (nums *)malloc(row_m2 * sizeof(nums));
+		for (int i = 0; i < row_m2; i++) {
+			matrix_g.m2.matrix_val[i].nums_len = column_m2;
+			matrix_g.m2.matrix_val[i].nums_val = (int *)malloc(column_m2 * sizeof(int));
+		}
+
+
+		// Introducimos los datos a las matrices por la consola
+		printf("Input the first matrix (one line for each row): \n");
+
+		for (int i = 0; i < matrix_g.m1.matrix_len; i++) {
+			fgets(input, sizeof(input), stdin);
+			input[strcspn(input, "\n")] = '\0';
+	
+			token = strtok(input, " ");
+			for (int j = 0; j < matrix_g.m1.matrix_val[i].nums_len; j++) {
+				if (token == NULL) {
+					printf("Not enough numbers!\n");
+					exit(1);
+				}
+				if (!is_number_int(token)) {
+					printf("Not a number!\n");
+					exit(1);
+				}
+				matrix_g.m1.matrix_val[i].nums_val[j] = atoi(token);
+				token = strtok(NULL, " ");
+			}
+	
+			if (token != NULL) {
+				printf("More numbers than expected!\n");
+				exit(1);
+			}
+		}
+
+		printf("\n\n");
+
+		
+		printf("Input the second matrix (one line for each row): \n");
+
+		for (int i = 0; i < matrix_g.m2.matrix_len; i++) {
+			fgets(input, sizeof(input), stdin);
+			input[strcspn(input, "\n")] = '\0';
+	
+			token = strtok(input, " ");
+			for (int j = 0; j < matrix_g.m2.matrix_val[i].nums_len; j++) {
+				if (token == NULL) {
+					printf("Not enough numbers!\n");
+					exit(1);
+				}
+				if (!is_number_int(token)) {
+					printf("Not a number!\n");
+					exit(1);
+				}
+				matrix_g.m2.matrix_val[i].nums_val[j] = atoi(token);
+				token = strtok(NULL, " ");
+			}
+	
+			if (token != NULL) {
+				printf("More numbers than expected!\n");
+				exit(1);
+			}
+		}
+
+		printf("\n\n");
+
+		printf("\n\n");
+		
+		switch (operation)
+		{
+			case '+': 
+					calcvectormatrixprog_1(host, 6, &matrix_g, &matrix);
+					break;
+			case '-': 
+					calcvectormatrixprog_1 (host, 7, &matrix_g, &matrix);
+					break;
+			case '*': 
+					calcvectormatrixprog_1 (host, 8, &matrix_g, &matrix);
+					break;
+		}
+		
 		break;	
+		} // Termina el modo matrix-----------------------------------------------------------------
 
 	default:
 		perror("not a valid mode");
 		exit(1);
 	}
+
 
 exit (0);
 }

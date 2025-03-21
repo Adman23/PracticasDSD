@@ -166,7 +166,6 @@ calcvectormatrixprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		matrix_group sum_matrix_1_arg;
 		matrix_group sub_matrix_1_arg;
 		matrix_group mul_matrix_1_arg;
-		matrix mod_matrix_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -223,12 +222,6 @@ calcvectormatrixprog_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_matrix_group;
 		_xdr_result = (xdrproc_t) xdr_matrix;
 		local = (char *(*)(char *, struct svc_req *)) mul_matrix_1_svc;
-		break;
-
-	case MOD_MATRIX:
-		_xdr_argument = (xdrproc_t) xdr_matrix;
-		_xdr_result = (xdrproc_t) xdr_float;
-		local = (char *(*)(char *, struct svc_req *)) mod_matrix_1_svc;
 		break;
 
 	default:

@@ -57,6 +57,5 @@ program CALCVECTORMATRIXPROG{
         matrix SUM_MATRIX(matrix_group) = 6;
         matrix SUB_MATRIX(matrix_group) = 7;
         matrix MUL_MATRIX(matrix_group) = 8;
-        float MOD_MATRIX(matrix) = 9;        
     } = 1;                         
 } = 0x20000003;

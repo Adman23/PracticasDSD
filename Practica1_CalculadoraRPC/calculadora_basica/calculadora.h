@@ -145,9 +145,6 @@ extern  matrix * sub_matrix_1_svc(matrix_group *, struct svc_req *);
 #define MUL_MATRIX 8
 extern  matrix * mul_matrix_1(matrix_group *, CLIENT *);
 extern  matrix * mul_matrix_1_svc(matrix_group *, struct svc_req *);
-#define MOD_MATRIX 9
-extern  float * mod_matrix_1(matrix *, CLIENT *);
-extern  float * mod_matrix_1_svc(matrix *, struct svc_req *);
 extern int calcvectormatrixprog_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -175,9 +172,6 @@ extern  matrix * sub_matrix_1_svc();
 #define MUL_MATRIX 8
 extern  matrix * mul_matrix_1();
 extern  matrix * mul_matrix_1_svc();
-#define MOD_MATRIX 9
-extern  float * mod_matrix_1();
-extern  float * mod_matrix_1_svc();
 extern int calcvectormatrixprog_1_freeresult ();
 #endif /* K&R C */
 

@@ -144,7 +144,8 @@ sufix_1_svc(char **string, struct svc_req *rqstp)
 	// Cada número que se encuentre se manda a la pila, cada operación se hace con los dos números superiores
 	// Si se da el caso de encontrar operación y no haber números en la pila suficientes --> Error
 	// Si se da el caso de tener la pila con números y terminar la cadena --> Error
-	// Si se da el caso de meter en la pila pero está llena --> Error (Este es error por la implementación, mayor tamaño daría margen a operaciones más grandes -> max 10)
+	// Si se da el caso de meter en la pila pero está llena --> Error (Este es error por la implementación, 
+	// mayor tamaño daría margen a operaciones más grandes -> max 10)
 	char *token = strtok(*string, " ");
 	while (token != NULL)
 	{
@@ -391,25 +392,6 @@ sum_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 		result.matrix_val[i].nums_val = (int *)malloc(result.matrix_val[i].nums_len * sizeof(int));
 	}
 
-	char tmp[50];
-
-	sprintf(tmp," %d ", mg->m1.matrix_val[0].nums_val[0]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m1.matrix_val[0].nums_val[1]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m1.matrix_val[1].nums_val[0]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m1.matrix_val[1].nums_val[1]);
-
-	sprintf(tmp," %d ", mg->m2.matrix_val[0].nums_val[0]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m2.matrix_val[0].nums_val[1]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m2.matrix_val[1].nums_val[0]);
-	perror(tmp);
-	sprintf(tmp," %d ", mg->m2.matrix_val[1].nums_val[1]);
-	
-
 
 	// Verificamos que las dimensiones de las matrices son iguales
 	// Comprobamos que tengan el mismo número de filas y luego que las primeras filas tengan el mismo número de columnas
@@ -436,11 +418,9 @@ matrix *
 sub_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 {
 	static matrix result;
+	xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val));
 	result.matrix_val = NULL;
 	result.matrix_len = 0;
-	
-	if (result.matrix_val != NULL)
-		xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val)); // Liberamos memoria de otras ejecuciones de la operacion
 
 	// Asignamos memoria pertinente para esta operación
 	result.matrix_len = mg->m1.matrix_len;
@@ -473,12 +453,9 @@ matrix *
 mul_matrix_1_svc(matrix_group *mg, struct svc_req *rqstp)
 {
 	static matrix result;
+	xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val));
 	result.matrix_val = NULL;
 	result.matrix_len = 0;
-	
-	if (result.matrix_val != NULL)
-		xdr_free((xdrproc_t)xdr_nums, &(result.matrix_val)); // Liberamos memoria de otras ejecuciones de la operacion
-
 
 	// Asignamos memoria pertinente para esta operación
 	result.matrix_len = mg->m1.matrix_len;

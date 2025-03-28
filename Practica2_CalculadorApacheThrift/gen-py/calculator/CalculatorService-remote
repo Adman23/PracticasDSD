@@ -16,15 +16,21 @@ else:
 from thrift.transport import TTransport, TSocket, TSSLSocket, THttpClient
 from thrift.protocol.TBinaryProtocol import TBinaryProtocol
 
-from tutorial import MultiplicationService
-from tutorial.ttypes import *
+from calculator import CalculatorService
+from calculator.ttypes import *
 
 if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('')
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  int multiply(int n1, int n2)')
+    print('  double mul( nums)')
+    print('  double sum( nums)')
+    print('  double sub(double n1, double n2)')
+    print('  double div(double n1, double n2)')
+    print('  int mcd( nums)')
+    print('  int mcm( nums)')
+    print('  int factorial(int num)')
     print('')
     sys.exit(0)
 
@@ -101,14 +107,50 @@ else:
     else:
         transport = TTransport.TBufferedTransport(socket)
 protocol = TBinaryProtocol(transport)
-client = MultiplicationService.Client(protocol)
+client = CalculatorService.Client(protocol)
 transport.open()
 
-if cmd == 'multiply':
-    if len(args) != 2:
-        print('multiply requires 2 args')
+if cmd == 'mul':
+    if len(args) != 1:
+        print('mul requires 1 args')
         sys.exit(1)
-    pp.pprint(client.multiply(eval(args[0]), eval(args[1]),))
+    pp.pprint(client.mul(eval(args[0]),))
+
+elif cmd == 'sum':
+    if len(args) != 1:
+        print('sum requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.sum(eval(args[0]),))
+
+elif cmd == 'sub':
+    if len(args) != 2:
+        print('sub requires 2 args')
+        sys.exit(1)
+    pp.pprint(client.sub(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'div':
+    if len(args) != 2:
+        print('div requires 2 args')
+        sys.exit(1)
+    pp.pprint(client.div(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'mcd':
+    if len(args) != 1:
+        print('mcd requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.mcd(eval(args[0]),))
+
+elif cmd == 'mcm':
+    if len(args) != 1:
+        print('mcm requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.mcm(eval(args[0]),))
+
+elif cmd == 'factorial':
+    if len(args) != 1:
+        print('factorial requires 1 args')
+        sys.exit(1)
+    pp.pprint(client.factorial(eval(args[0]),))
 
 else:
     print('Unrecognized method %s' % cmd)

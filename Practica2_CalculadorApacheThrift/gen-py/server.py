@@ -11,6 +11,9 @@ from thrift.server import TServer
 
 import logging
 
+import math
+from functools import reduce
+
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -30,6 +33,10 @@ def handle_list_exceptions(operation):
                     raise EmptyListError("The list passed by argument is empty")
                 if all(isinstance(num, int) for num in nums):
                     raise ValueError("The passed arguments are incorrect")
+
+            if (operation.__name__ == "mcd" or operation.__name__ == "mcm") and len(args[0]) < 4:
+                raise EmptyListError("The list passed by argument doesnt have enough elements")
+
 
             return operation(self, *args) # Si es correcto ejecuta la función normal
 
@@ -106,19 +113,29 @@ class CalculatorHandler:
 
     @handle_list_exceptions
     def mcd(self, nums):
-        return "Not implemented"
+        print(nums)
+        print(len(nums))
+        return reduce(math.gcd, nums)
 
     @handle_list_exceptions
     def mcm(self, nums):
-        return "Not implemented"
+        return reduce(math.lcm, nums)
 
     @handle_int_exeception
     def factorial(self, num):
-        return "Not implemented"
+        result = num
+        num -= 1
+        if num > 0:
+            while num > 0:
+                result *= num
+                num -= 1
+        else:
+            result = 1
+        return result
 
     @handle_int_exeception
     def mod(self, n1, n2):
-        return "Not implemented"
+        return n1 % n2
 
 
 

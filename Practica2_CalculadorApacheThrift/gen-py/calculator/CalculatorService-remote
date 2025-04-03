@@ -24,10 +24,12 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('Usage: ' + sys.argv[0] + ' [-h host[:port]] [-u url] [-f[ramed]] [-s[sl]] [-novalidate] [-ca_certs certs] [-keyfile keyfile] [-certfile certfile] function [arg1 [arg2...]]')
     print('')
     print('Functions:')
-    print('  double mul( nums)')
-    print('  double sum( nums)')
+    print('  double mul(double n1, double n2)')
+    print('  double sum(double n1, double n2)')
     print('  double sub(double n1, double n2)')
     print('  double div(double n1, double n2)')
+    print('  double pow(double n1, double n2)')
+    print('  int mod(int n1, int n2)')
     print('  int mcd( nums)')
     print('  int mcm( nums)')
     print('  int factorial(int num)')
@@ -111,16 +113,16 @@ client = CalculatorService.Client(protocol)
 transport.open()
 
 if cmd == 'mul':
-    if len(args) != 1:
-        print('mul requires 1 args')
+    if len(args) != 2:
+        print('mul requires 2 args')
         sys.exit(1)
-    pp.pprint(client.mul(eval(args[0]),))
+    pp.pprint(client.mul(eval(args[0]), eval(args[1]),))
 
 elif cmd == 'sum':
-    if len(args) != 1:
-        print('sum requires 1 args')
+    if len(args) != 2:
+        print('sum requires 2 args')
         sys.exit(1)
-    pp.pprint(client.sum(eval(args[0]),))
+    pp.pprint(client.sum(eval(args[0]), eval(args[1]),))
 
 elif cmd == 'sub':
     if len(args) != 2:
@@ -133,6 +135,18 @@ elif cmd == 'div':
         print('div requires 2 args')
         sys.exit(1)
     pp.pprint(client.div(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'pow':
+    if len(args) != 2:
+        print('pow requires 2 args')
+        sys.exit(1)
+    pp.pprint(client.pow(eval(args[0]), eval(args[1]),))
+
+elif cmd == 'mod':
+    if len(args) != 2:
+        print('mod requires 2 args')
+        sys.exit(1)
+    pp.pprint(client.mod(eval(args[0]), eval(args[1]),))
 
 elif cmd == 'mcd':
     if len(args) != 1:

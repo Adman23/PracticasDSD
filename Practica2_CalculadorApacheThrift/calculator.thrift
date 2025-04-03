@@ -22,7 +22,7 @@ service CalculatorService
         double pow(1:double n1, 2:double n2),
 
         // Modulo de un número
-        int mod(1:int num, 2:int num)
+        int mod(1:int n1, 2:int n2)
 
         // Máximo común divisor con un mínimo de 4 números, si se pasan menos de 4 se controla
         // desde la definición de la función

@@ -47,7 +47,7 @@ def handle_two_floats_exception(operation):
     def wrapper(self, *args): # Encapsula las operaciones para añadirle la funcionalidad
         try:
 
-            if not isinstance(args[0], float or int) and not isinstance(args[1],float or int):  # Comprobamos que el segundo argumento también
+            if not isinstance(args[0], float) and not isinstance(args[1],float):  # Comprobamos que el segundo argumento también
                 raise ValueError("The passed arguments are incorrect")
             elif operation.__name__ == "div" and args[1] == 0:
                 raise ZeroDivisionError("The list passed by argument is empty")

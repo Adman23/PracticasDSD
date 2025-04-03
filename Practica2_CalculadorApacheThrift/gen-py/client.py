@@ -134,16 +134,25 @@ class Calculator:
 
 
         for indice, token in tokens:  # Parseamos y vamos llamando a las funciones pertinentes
-            if token in '^!+-*/%':
-                if token == "!":
-                    res = client.factorial(res)
-                    tokens.remove(token)
+            try:
+                if token in '^!+-*/%':
+                    if token == "!":
+                        res = client.factorial(res)
+                        tokens.remove(token)
+                    else:
+                        if token == '%':
+                            res = self.operations[token](int(res), int(tokens[indice + 1]))
+                        else:
+                            res = self.operations[token](float(res), float(tokens[indice + 1]))
+
+                        tokens.remove(token)
+                        tokens.remove(tokens[indice + 1])
                 else:
-                    res = self.operations[token](res, tokens[indice+1])
-                    tokens.remove(token)
-                    tokens.remove(tokens[indice+1])
-            else:
-                res = "Operacion mal construida"
+                    raise ValueError
+
+            except ValueError:
+                res = "Valor incorrecto"
+
 
         self.result.set(str(res))
 

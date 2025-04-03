@@ -8,17 +8,21 @@ service CalculatorService
         // Si se pide solo int se limita la funcionalidad. Otra solución es hacer 2 funciones
         // de cada, una para double otra para int.
 
-        // Acepta un listado de números de tamaño dinámico que se multiplican en cadena
-        double mul(1:list<double> nums),
+        double mul(1:double n1, 2:double n2),
 
-        // Acepta un listado de números de tamaño dinámico que se suman en cadena
-        double sum(1:list<double> nums),
+        double sum(1:double n1, 2:double n2),
 
         // Acepta dos double para restarlos
         double sub(1:double n1, 2:double n2),
 
         // Acepta dos double para dividirlos
         double div(1:double n1, 2:double n2),
+
+        // Acepta dos dobles para hacer la potencia
+        double pow(1:double n1, 2:double n2),
+
+        // Modulo de un número
+        int mod(1:int num, 2:int num)
 
         // Máximo común divisor con un mínimo de 4 números, si se pasan menos de 4 se controla
         // desde la definición de la función
@@ -29,6 +33,8 @@ service CalculatorService
         int mcm(1:list<int> nums),
 
         // Factorial de un número
-        int factorial(1:int num)
+        int factorial(1:int num),
+
+
 
 }

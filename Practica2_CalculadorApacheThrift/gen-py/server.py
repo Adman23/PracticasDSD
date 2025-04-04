@@ -113,8 +113,6 @@ class CalculatorHandler:
 
     @handle_list_exceptions
     def mcd(self, nums):
-        print(nums)
-        print(len(nums))
         return reduce(math.gcd, nums)
 
     @handle_list_exceptions

@@ -2,14 +2,10 @@
 typedef i32 int
 service CalculatorService
 {
-        // Todas estas operaciones aceptan doubles porque pueden, ahora, si se pasan int
-        // no pasa nada, simplemente se hace casting al pasarlos como argumento y
-        // luego se vuelve a hacer casting si se quiere el resultado explicitamente como int
-        // Si se pide solo int se limita la funcionalidad. Otra solución es hacer 2 funciones
-        // de cada, una para double otra para int.
-
+        // Acepta dos doubles para sumarlos
         double mul(1:double n1, 2:double n2),
 
+        // Acepta dos double para multiplicarlos
         double sum(1:double n1, 2:double n2),
 
         // Acepta dos double para restarlos
@@ -34,7 +30,5 @@ service CalculatorService
 
         // Factorial de un número
         int factorial(1:int num),
-
-
 
 }

@@ -1,0 +1,6 @@
+# Fichero: server.policy
+
+grant codeBase "file:./" {
+    permission java.security.AllPermission;
+};
+

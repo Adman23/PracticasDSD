@@ -15,17 +15,19 @@ public interface DonationInterface  extends Remote{
     // En caso de que esté registrado devuelve el nombre del servidor (que tiene el puerto)
     // Cuando lo registra le devuelve el puerto también
     
-    public int registered(String clientName) throws RemoteException;
+    public int registered(String clientName, ArrayList<String> visitedServers) throws RemoteException;
     public int register(String clientName) throws RemoteException;
 
     // La restricción es que esté registrado
     public void donate(String clientName, float amount) throws RemoteException;
     
     // Como la restricción es que haya donado una vez se comprueba ese valor
-    public float totalAmountDonated(String clientName) throws RemoteException;
+    public float totalAmountDonated(String clientName, boolean onlyGetValue) throws RemoteException;
 
     // Devolverá tal cual el listado de clientes que hayan donado,
-    // esto se puede hacer teniendo 2 arrayList(tedioso)
+    // esto se puede Shacer teniendo 2 arrayList(tedioso)
     // o se puede hacer filtrando el arrayList que se tenga de clientes (mas práctico)
-    public ArrayList<Client> benefactors(String clientName) throws RemoteException;
+    public ArrayList<String> benefactors(String clientName, boolean onlyGetValue) throws RemoteException;
+
+    public int getNumClients() throws RemoteException;
 }

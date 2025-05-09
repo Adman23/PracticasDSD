@@ -39,8 +39,12 @@ public class Main {
                     try {
                         Registry registryLogin = LocateRegistry.getRegistry("127.0.0.1", 1099);
                         DonationInterface donationProgramLogin = (DonationInterface) registryLogin.lookup("servidor_1099");
-                        if ((port=donationProgramLogin.registered(name)) != -1){
+                        if ((port=donationProgramLogin.registered(name, new ArrayList<>())) > 0){
                             isRegistered = true;
+                        }
+                        else if (port == -2){
+                            System.out.println("Error al consultar el registro.");
+                            System.exit(0);
                         }
                     }
                     catch (NotBoundException | RemoteException e) {
@@ -117,7 +121,7 @@ public class Main {
                                 case 2:
                                     System.out.println("Ejecutando getTotal...");
                                     try {
-                                        float total = donationProgram.totalAmountDonated(name);
+                                        float total = donationProgram.totalAmountDonated(name, false);
                                         System.out.println("Total donado: " + total);
                                     } catch (Exception e) {
                                         System.out.println("Error al obtener el total donado: " + e.getMessage());
@@ -126,10 +130,10 @@ public class Main {
                                 case 3:
                                     System.out.println("Ejecutando getBenefactors...");
                                     try {
-                                        ArrayList<Client> benefactors = donationProgram.benefactors(name);
+                                        ArrayList<String> benefactors = donationProgram.benefactors(name, false);
                                         System.out.println("Benefactores:");
-                                        for (Client client : benefactors) {
-                                            System.out.println(client.getName());
+                                        for (String client : benefactors) {
+                                            System.out.println(client);
                                         }
                                     } catch (Exception e) {
                                         System.out.println("Error al obtener los benefactores: " + e.getMessage());

@@ -37,7 +37,6 @@ def handle_list_exceptions(operation):
             if (operation.__name__ == "mcd" or operation.__name__ == "mcm") and len(args[0]) < 4:
                 raise EmptyListError("The list passed by argument doesnt have enough elements")
 
-
             return operation(self, *args) # Si es correcto ejecuta la función normal
 
         except EmptyListError as e:

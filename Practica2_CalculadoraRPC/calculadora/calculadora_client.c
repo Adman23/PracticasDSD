@@ -148,8 +148,6 @@ calcadvancedprog_1(char *host, int operation, oper *oper, char *string)
 
 
 
-
-
 void
 calcvectormatrixprog_1(char *host, int operation, matrix_group *mg, matrix *m)
 {

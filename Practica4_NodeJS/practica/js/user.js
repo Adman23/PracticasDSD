@@ -122,6 +122,13 @@ socket.on('history', (events) => {
   events.reverse().forEach(addEventToHistory); // Más reciente arriba
 });
 
+socket.on('alert', (alert) => {
+  const historyList = document.getElementById("event-history");
+  const li = document.createElement("li");
+  li.textContent = `Alerta -> ${alert.message}`;
+  historyList.prepend(li);
+})
+
 socket.emit('getHistory');
 
 

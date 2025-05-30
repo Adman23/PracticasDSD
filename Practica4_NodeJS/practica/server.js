@@ -216,7 +216,7 @@ connectDB().then((db) => {
       client.on('alert', (alert) => {
         // Reenvía el comando en caso de que exista el tipo de actuador entre los conectados
           console.log("SE REENVIA ALERTA");
-        if (connectedActuators[alert.target]) {
+        if (connectedSensors[alert.target]) {
           io.sockets.emit('alert', alert);
         }
         else{

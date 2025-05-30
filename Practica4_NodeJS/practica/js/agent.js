@@ -45,24 +45,15 @@ socket.on('event', (data) => {
   }
 
   // Si no ha roto un umbral no hay alerta que poner
-  if (alert)
-    // buscamos el actuador
-    for (const [key, value] of Object.entries(actuators)) {
-      if (value.sensor === target) {
-        value["buscado"] = key;
-      }
-    }
+  if (alert){
+    console.log(`Agente envía alerta: ${target} con ${alert}`);
+    socket.emit('alert', {
+      target: target,
+      event: alert,
+      message: `Umbral ${alert} superado con el valor: ${num}`,
+    });
+  }
 
-
-    if (value["buscado"]) {
-      console.log(`Agente envía alerta: ${target} con ${alert}`);
-      socket.emit('alert', {
-        target: value["buscado"],
-        event: alert,
-        message: `Umbral ${alert} superado con el valor: ${num}`,
-      });
-      value["buscado"] = null;
-    }
 });
 
 // Esto es en caso de que algún actuador cambie (puede ser por usuario o por alerta)

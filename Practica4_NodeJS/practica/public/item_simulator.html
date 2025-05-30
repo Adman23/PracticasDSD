@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/itemController.js" defer></script>
+</head>
+<body>
+    <section class="sensors">
+        <!-- Listado de sensores -->
+        <ul class="sensor-list">
+            <!--
+            <li class="sensor">
+                <h3>target(name)</h3>
+                <p>Last value: valor<p>
+                <form class="add-sensor-event">
+                    <label for="value">Valor:</label>
+                    <input type="number" id="value" name="value">
+                </form>
+            </li>
+            -->
+        </ul>
+        <!-- Formulario de creación de sensor -->
+        <form id="create-sensor-form">
+            <label for="sensor-target">Sensor target:</label>
+            <input type="text" id="sensor-target" name="sensor-target" required>
+
+            <button onclick="createNewSensor()">Create</button>
+        </form>
+    </section>
+
+    <section class="actuators">
+        <!-- Listado de actuadores -->
+        <ul class="actuator-list">
+            <!--
+            <li class="actuator">
+                <h3>target(name)</h3>
+                <p>Sensor: tempertature/.../null</p>
+                <p>State: valor<p>
+            </li>
+            -->
+        </ul>
+        <!-- Formulario de creación de sensor -->
+        <form id="create-actuator-form">
+            <label for="actuator-target">Actuator target:</label>
+            <input type="text" id="actuator-target" name="actuator-target" required>
+
+            <label for="sensor-friend">Actuator target:</label>
+            <input type="text" id="sensor-friend" name="sensor-friend">
+
+            <button onclick="createNewActuator()">Create</button>
+        </form>
+    </section>
+</body>
+</html>

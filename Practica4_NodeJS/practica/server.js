@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
 
 // Establecemos localhost/sensors para renderizar la interfaz de sensores
 app.get("/sensors", (req, res) => {
-  const filePath = join(__dirname, 'public', 'sensor_simulator.html');
+  const filePath = join(__dirname, 'public', 'item_simulator.html');
   res.sendFile(filePath);
 })
 
@@ -151,12 +151,12 @@ connectDB().then((db) => {
 
       // -- GESTIÓN DE EVENTO --
       client.on('event', async (data) => {
-        const event = { type: data.type, value: data.value, timestamp: new Date() };
+        const event = { target: data.target, value: data.value, timestamp: new Date() };
         await eventsCollection.insertOne(event);
         io.sockets.emit('event', event);
       })
 
-      // -- COMANDOS DE USUARIOS -- cmd -> {target: ac/blinds, order: open/close}
+      // -- COMANDOS DE USUARIOS -- cmd -> {target: ac/blinds, state: true/false}
       client.on('command', (cmd) => {
         // Reenvía el comando en caso de que exista el tipo de actuador entre los conectados
         if (connectedActuators[cmd.target]) {

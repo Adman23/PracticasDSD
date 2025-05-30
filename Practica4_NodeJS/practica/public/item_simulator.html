@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="../js/itemController.js" defer></script>
+    <title>Simulador de sensores</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="../js/itemController.js" defer></script>
 </head>
 <body>
     <section class="sensors">
         <!-- Listado de sensores -->
-        <ul class="sensor-list">
+        <ul id="sensor-list">
             <!--
             <li class="sensor">
                 <h3>target(name)</h3>
@@ -25,13 +26,13 @@
             <label for="sensor-target">Sensor target:</label>
             <input type="text" id="sensor-target" name="sensor-target" required>
 
-            <button onclick="createNewSensor()">Create</button>
+            <button type="submit">Create</button>
         </form>
     </section>
 
     <section class="actuators">
         <!-- Listado de actuadores -->
-        <ul class="actuator-list">
+        <ul id="actuator-list">
             <!--
             <li class="actuator">
                 <h3>target(name)</h3>
@@ -45,10 +46,10 @@
             <label for="actuator-target">Actuator target:</label>
             <input type="text" id="actuator-target" name="actuator-target" required>
 
-            <label for="sensor-friend">Actuator target:</label>
+            <label for="sensor-friend">Actuator sensor:</label>
             <input type="text" id="sensor-friend" name="sensor-friend">
 
-            <button onclick="createNewActuator()">Create</button>
+            <button type="submit">Create</button>
         </form>
     </section>
 </body>

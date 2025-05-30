@@ -1,10 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8" />
+  <title>Interfaz de dispositivo - Usuario</title>
+  <script type="module" src="../js/user.js" defer></script>
+    <style>
+        body {
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 <body>
+  <h1>Interfaz de usuario - Domótica</h1>
 
+  <section class="actuators">
+    <h2>Actuadores disponibles</h2>
+    <ul id="actuator-list" class="actuator-list"></ul>
+  </section>
+
+  <section class="thresholds">
+    <h3>Actualizar umbrales de los sensores</h3>
+    <form id="threshold-form">
+      <label for="sensor-name">Nombre del sensor:</label>
+      <input type="text" id="sensor-name" name="sensor-name" required />
+
+      <label for="value-over">Umbral superior:</label>
+      <input type="number" id="value-over" name="value-over" step="any" required />
+
+      <label for="value-under">Umbral inferior:</label>
+      <input type="number" id="value-under" name="value-under" step="any" required />
+
+      <button type="submit">Actualizar umbrales</button>
+    </form>
+  </section>
+
+  <section class="history">
+    <h2>Historial de eventos</h2>
+    <ul id="event-history"></ul>
+  </section>
 </body>
 </html>

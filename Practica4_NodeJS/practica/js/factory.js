@@ -1,5 +1,5 @@
-import {Sensor} from './Sensor';
-import {Actuator} from './Actuator';
+import {Sensor} from './Sensor.js';
+import {Actuator} from './Actuator.js';
 
 // Función para crear sensor
 export function createSensor(target) {

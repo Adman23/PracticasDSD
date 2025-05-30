@@ -5,6 +5,7 @@ import express from 'express';
 import {fileURLToPath} from 'url';
 import * as path from "node:path";
 import {Server} from 'socket.io';
+import { spawn } from 'child_process';
 
 // Establecemos la url de la base de datos
 const uri_db = "mongodb://localhost:27017";
@@ -18,6 +19,8 @@ const __dirname = path.dirname(__filename); // Ruta absoluta del proyecto /pract
 // Establecemos express para enrutar
 const app = express();
 const PORT = 8080; // Puerto en el que funcionar
+
+app.use('/js', express.static(join(__dirname, 'js')));
 
 // Establecemos el localhost para renderizar index
 app.get("/", (req, res) => {
@@ -35,6 +38,25 @@ app.get("/sensors", (req, res) => {
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Función para que el agente funcione en segundo plano
+function launchAgent() {
+  const agentProcess = spawn('node', [path.join(__dirname, 'js', 'agent.js')]);
+
+  agentProcess.stdout.on('data', (data) => {
+    console.log(`[Agente] ${data}`);
+  });
+
+  agentProcess.stderr.on('data', (data) => {
+    console.error(`[Agente - ERROR] ${data}`);
+  });
+
+  agentProcess.on('close', (code) => {
+    console.log(`[Agente] Proceso cerrado con código: ${code}`);
+  });
+
+  return agentProcess;
+}
+
 
 // Creamos la API de uso para las funciones del cliente
 // Función de conexión a la base de datos (se guarda en db)
@@ -42,7 +64,6 @@ async function connectDB() {
   try{
     await client_db.connect();
     const db = client_db.db("sistemaDomotico");
-    console.log(db.listCollections());
     return db
   }
   catch(err){
@@ -66,7 +87,11 @@ connectDB().then((db) => {
     };
     const connectedSensors = {
       /*
-        target: id
+        sensorName: {
+                    id: id
+                    over: overValue, default null
+                    under: underValue default null
+                    }
        */
     };
 
@@ -113,15 +138,30 @@ connectDB().then((db) => {
       client.on('actuatorChange', (data) => {
         const { target, state } = data;
         if (connectedActuators[target]) {
+          console.log(`emiting change on actuator: ${target} con ${state}`);
           connectedActuators[target].state = state;
+          io.sockets.emit('actuatorChange', {target: target, state: state});
+        }
+        else{
+          console.log("No such actuator");
         }
       })
 
 
       // -- REGISTRO SENSOR --
-      client.on('registerSensor', (target) => {
+      client.on('registerSensor', async (target) => {
         if (!connectedSensors[target]) {
-          connectedSensors[target] = client.id;
+          const thresholdCollection = db.collection("thresholds");
+
+          // Buscamos a ver si tiene umbrales
+          const stored = await thresholdCollection.findOne({target: target});
+
+          // Si tiene que se los guarde, si no tiene que sea null
+          connectedSensors[target] = {
+            id: client.id,
+            over: stored?.thresholds?.over ?? null,
+            under: stored?.thresholds?.under ?? null,
+          }
           broadcastStatus();
           console.log(`Sensor de ${target} registrado con id: ${client.id}`);
         }
@@ -130,8 +170,8 @@ connectDB().then((db) => {
       // -- DESCONEXIÓN --
       client.on('disconnect', () => {
         // En caso de que sea un sensor
-        for (const [target,id] of Object.entries(connectedSensors)) {
-          if (id === client.id) {
+        for (const [target,info] of Object.entries(connectedSensors)) {
+          if (info.id === client.id) {
             delete connectedSensors[target];
           broadcastStatus();
           }
@@ -146,12 +186,16 @@ connectDB().then((db) => {
           console.log(`Actuador de ${target} desconectado`);
         }
 
+        console.log(`Se ha desconectado cliente: ${client.id}`);
         broadcastStatus();
       });
 
       // -- GESTIÓN DE EVENTO --
       client.on('event', async (data) => {
-        const event = { target: data.target, value: data.value, timestamp: new Date() };
+        const event = { target: data.target, value: data.value, timestamp: new Date(),
+          over: connectedSensors[data.target].over,
+          under: connectedSensors[data.target].under};
+        console.log(`evento recibido: ${data.target} y ${data.value}`);
         await eventsCollection.insertOne(event);
         io.sockets.emit('event', event);
       })
@@ -171,6 +215,7 @@ connectDB().then((db) => {
       // -- ALERTAS DE AGENTE -- alert -> {target: temperature/luminosity, event: wentOver/wentUnder}
       client.on('alert', (alert) => {
         // Reenvía el comando en caso de que exista el tipo de actuador entre los conectados
+          console.log("SE REENVIA ALERTA");
         if (connectedActuators[alert.target]) {
           io.sockets.emit('alert', alert);
         }
@@ -179,11 +224,45 @@ connectDB().then((db) => {
             message: `El actuador ${alert.target} no está conectado`, target: alert.target});
         }
       });
+
+      // -- ACTUALIZACIÓN DE UMBRALES --
+      client.on('updateThreshold', (sensor) => {
+        const { target, thresholds } = sensor;
+
+        if ( !target || !thresholds || (isNaN(thresholds.over) || isNaN(thresholds.under)) ) {
+          console.log("El usuario ha mandado datos invalidos para los umbrales");
+          return;
+        }
+
+        const thresholdCollection = db.collection('thresholds');
+        thresholdCollection.updateOne(
+            {target: target},
+            {
+              $set: {
+                target: target,
+                thresholds: {
+                  over: thresholds.over,
+                  under: thresholds.under,
+                },
+                timestamp: new Date(),
+              }
+            }, {upsert: true}); // En caso de que no exista le pedimos que se cree
+
+        console.log("Se han actualizado los umbrales");
+
+        // Lo actualizamos también en el server
+        connectedSensors[target].over = thresholds.over;
+        connectedSensors[target].under = thresholds.under;
+
+        broadcastStatus();
+      });
     })
+
 
     // Lanzamos el servidor en el puerto
     server.listen(PORT, () => {
       console.log(`Server started on port ${PORT}`);
+      launchAgent();
     })
   }
 );

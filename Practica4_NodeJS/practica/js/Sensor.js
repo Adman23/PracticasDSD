@@ -1,4 +1,4 @@
-import {io} from 'socket.io-client';
+import {io} from 'https://cdn.jsdelivr.net/npm/socket.io-client/+esm';
 
 export class Sensor {
   constructor(target) {

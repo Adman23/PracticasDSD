@@ -1,4 +1,4 @@
-import {io} from 'socket.io-client';
+import {io} from 'https://cdn.jsdelivr.net/npm/socket.io-client/+esm';
 
 export class Actuator {
   constructor(target, sensor) {
@@ -13,6 +13,24 @@ export class Actuator {
       target: this.target,
       state: this.state,
       sensor: this.sensor
+    });
+
+
+    // Recibimos alertas del agente
+    this.socket.on('alert', (alert) => {
+      if (alert.target === this.sensor) {
+        if (alert.event === "under"){
+          this.state = false;
+        }
+        else if (alert.event === "over"){
+          this.state = true;
+        }
+
+        this.socket.emit('actuatorChange', {
+          target: this.target,
+          state: this.state,
+        });
+      }
     });
 
     // Recibimos comandos del usuario
